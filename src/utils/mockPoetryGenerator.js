@@ -1,8 +1,14 @@
 /**
  * Mock poetry generator for when the API server is down
+ * 
+ * This function generates a mock poem when the API is unavailable.
+ * For Sonnets, it will always generate 14 lines regardless of poemLength parameter.
+ * For other poem types, the mock templates have fixed lengths but the parameter is passed
+ * to maintain consistency with the API interface.
  */
 
-export const generateMockPoem = (poemType, city, pollutant, avgPollutionRate, fromDate, toDate) => {
+export const generateMockPoem = (poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength = 14) => {
+  // Note: The mock poems have fixed structures, but we accept poemLength to match the API interface
   // Format dates for readability
   const formattedFromDate = new Date(fromDate).toLocaleDateString('en-US', { 
     year: 'numeric', month: 'long', day: 'numeric' 

@@ -30,6 +30,7 @@ const PoetryGenerator = () => {
   const [avgPollutionRate, setAvgPollutionRate] = useState(0);
   const [pollutionData, setPollutionData] = useState([]);
   const [feedbackText, setFeedbackText] = useState("");
+  const [poemLength, setPoemLength] = useState(14); // Default to 14 lines for Sonnet
 
   const loadPollutionData = useCallback(async () => {
     let dataFile;
@@ -58,6 +59,20 @@ const PoetryGenerator = () => {
   useEffect(() => {
     loadPollutionData();
   }, [city, pollutant, loadPollutionData]);
+  
+  // Update poem length based on poem type
+  useEffect(() => {
+    if (poemType === "Sonnet") {
+      // Sonnets must have exactly 14 lines (fixed)
+      setPoemLength(14);
+    } else if (poemType === "Ode") {
+      // Default for Odes
+      setPoemLength(16);
+    } else {
+      // Default for Free Verse
+      setPoemLength(12);
+    }
+  }, [poemType]);
 
   useEffect(() => {
     const calculateAvgPollutionRate = () => {
@@ -103,6 +118,7 @@ const PoetryGenerator = () => {
         avgPollutionRate,
         fromDate: fromDate.toISOString().split("T")[0],
         toDate: toDate.toISOString().split("T")[0],
+        length: poemLength, // Pass the poem length
         apiKey: apiKey // Pass the API key directly
       });
       
@@ -121,7 +137,8 @@ const PoetryGenerator = () => {
         pollutant, 
         avgPollutionRate, 
         fromDate.toISOString().split("T")[0], 
-        toDate.toISOString().split("T")[0]
+        toDate.toISOString().split("T")[0],
+        poemLength
       );
       
       setPoem(mockPoem);
@@ -476,6 +493,30 @@ const PoetryGenerator = () => {
                       <SelectItem value="Free Verse">Free Verse</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                
+                <div className="space-y-2 pl-8 relative">
+                  <div className="absolute left-0 top-4 w-6 h-6 rounded-full bg-forest-green/10 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-forest-green"></div>
+                  </div>
+                  <Label htmlFor="poemLength" className="text-gray-700 font-medium block">
+                    Number of Lines
+                  </Label>
+                  {poemType === "Sonnet" ? (
+                    <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                      14 lines (fixed for Sonnets)
+                    </div>
+                  ) : (
+                    <input
+                      type="number"
+                      id="poemLength"
+                      value={poemLength}
+                      onChange={(e) => setPoemLength(Number(e.target.value))}
+                      min="4"
+                      max="30"
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-green/50 focus:border-forest-green"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2 pl-8 relative">

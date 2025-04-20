@@ -39,12 +39,15 @@ export class GoogleGenerativeAI {
     // Base prompt
     let prompt = `
     Compose a ${poemType.toLowerCase()} about ${city}, reflecting on its unique atmosphere, history, and culture. 
-    The poem should be ${length} lines long, not more than that, inspired by the average pollution rate of ${avgPollutionRate.toFixed(2)} ${pollutant} recorded between ${formattedStartDate} and ${formattedEndDate}. 
+    The poem must be ${length} lines long.
+    The poem should be inspired by the average pollution rate of ${avgPollutionRate.toFixed(2)} ${pollutant} recorded between ${formattedStartDate} and ${formattedEndDate}. 
     Use vivid imagery and metaphors to illustrate the city's beauty and the subtle impacts of pollution on its environment and people. 
     The tone of the poem should be ${tone}, avoiding any overtly negative language and refraining from using the word 'smog'. 
     Capture the essence of ${city}, its resilience, and the daily life of its inhabitants in a manner that is both engaging and evocative.
-    It must be a ${length} lines ${poemType.toLowerCase()} not more or less than that.
-    It must replicate the style of ${poemType}.
+    
+    Requirements:
+    - The poem must contain ${length} lines total
+    - It must follow the style conventions of a ${poemType.toLowerCase()}
     `;
 
     // Add template specific to poem type
