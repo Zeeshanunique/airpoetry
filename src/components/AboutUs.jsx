@@ -47,20 +47,30 @@ const AboutUs = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold">Stefano Rozzoni</h3>
-                      <p className="text-primary">Literature Researcher</p>
+                      <p className="text-primary">Postdoc Research Fellow and Lecturer</p>
                     </div>
                   </div>
                   
                   <div className="space-y-4">
                     <p className="text-gray-700">
-                      PhD student in Literary Studies working at the intersection of British literature and 
-                      the environmental humanities, with a specific focus on air pollution in the Industrial Revolution era.
+                      Postdoc Research Fellow and lecturer on English literature. He works at the intersection of
+                      literature, philosophy, economics and education in the context of the Environmental Humanities,
+                      focusing on human-nonhuman ethical relationality.
                     </p>
                     
                     <div className="space-y-2">
                       <div className="flex items-center text-gray-600">
                         <GraduationCap className="w-4 h-4 mr-2" />
-                        <span>University of Bergamo, University of Kent</span>
+                        <span>
+                          <a 
+                            href="https://unibg.unifind.cineca.it/individual?uri=http://irises.unibg.it/resource/person/45662"
+                            className="text-primary hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            University of Bergamo
+                          </a>
+                        </span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <MapPin className="w-4 h-4 mr-2" />
@@ -73,11 +83,39 @@ const AboutUs = () => {
                       <ul className="space-y-2 text-gray-600">
                         <li className="flex items-start">
                           <CalendarDays className="w-4 h-4 mr-2 mt-1 flex-shrink-0" />
-                          <span>"The Poetics of AI: Generative Models and Environmental Literature" (2023)</span>
+                          <span>Rozzoni, Stefano, "Beyond the Icon, Beyond the Human: An Ecocritical Reading of Francis of Assisi
+                          across Irish and British Poetry (1960s-2010s)". In InScriptum: A Journal of Language and Literary
+                          Studies, 5, 2024, ISSN 2719-4418, pp. 53-85.</span>
                         </li>
                         <li className="flex items-start">
                           <Award className="w-4 h-4 mr-2 mt-1 flex-shrink-0" />
-                          <span>Presenter at the Digital Humanities Conference, Oxford University (2022)</span>
+                          <span>
+                            Presenter at the 14th Beyond Humanism Conference:
+                            <a 
+                              href="https://beyondhumanism2024.wordpress.com"
+                              className="text-primary hover:underline ml-1"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Technologies–Ecologies and the Networks of Posthuman Care
+                            </a>
+                            (2–5 July 2024, University of Łódź)
+                          </span>
+                        </li>
+                        <li className="flex items-start">
+                          <Award className="w-4 h-4 mr-2 mt-1 flex-shrink-0" />
+                          <span>
+                            Principal investigator of the 
+                            <a 
+                              href="https://www.nestresearchnetwork.org"
+                              className="text-primary hover:underline ml-1"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              NEST Research Network
+                            </a>
+                            – Narratives for Ecological and Sustainable Transition(s)
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -164,14 +202,13 @@ const AboutUs = () => {
               >
                 <h3 className="text-xl font-medium text-gray-800 mb-4">Research Context</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  This project evolved from Stefano Rozzoni's doctoral research on how Victorian literature 
-                  represented air pollution during the Industrial Revolution. Combining historical environmental 
-                  data with literary analysis revealed patterns in how writers responded to changing air quality.
+                  The project stems from Stefano Rozzoni's research on narrative as a model for human–nonhuman
+                  ethical relations, with a focus on literature and air pollution in Northern Italy.
                 </p>
                 <p className="text-gray-700 leading-relaxed mt-4">
-                  Zeeshan Ali's expertise in AI and natural language processing provided the technical framework 
-                  for transforming these insights into a generative system capable of creating new poetic works 
-                  based on contemporary air quality data.
+                  By integrating historical environmental data with literary analysis, it reveals how writers have
+                  responded to changing air quality over time within an Environmental Digital Humanities
+                  framework.
                 </p>
               </motion.div>
               
@@ -184,16 +221,17 @@ const AboutUs = () => {
               >
                 <h3 className="text-xl font-medium text-gray-800 mb-4">Conference Presentations</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  Our work has been presented at several academic conferences, including:
-                </p>
-                <ul className="list-disc pl-5 mt-4 space-y-2 text-gray-700">
-                  <li>The Digital Environmental Humanities Symposium (Oxford, 2023)</li>
-                  <li>AI and Creative Writing Conference (Cambridge, 2022)</li>
-                  <li>International Conference on Literature and Environment (Bergamo, 2022)</li>
-                </ul>
-                <p className="text-gray-700 mt-4">
-                  These presentations have helped refine our approach and connect with other researchers and 
-                  practitioners working at the intersection of technology, literature, and environmental studies.
+                  We presented a preliminary version of this project at the 14th Beyond Humanism Conference:
+                  <a 
+                    href="https://beyondhumanism2024.wordpress.com"
+                    className="text-primary hover:underline ml-1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Technologies–Ecologies and the Networks of Posthuman Care
+                  </a>
+                  (2–5 July 2024, University of Łódź), with a paper titled
+                  'Sustain-AI-bility' Poetics: Blending Technology and Ecology in e-Literary (Posthumanist) Practices.
                 </p>
               </motion.div>
               
