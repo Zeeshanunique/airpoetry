@@ -157,7 +157,7 @@ const AboutUs = () => {
                     <div className="space-y-2">
                       <div className="flex items-center text-gray-600">
                         <GraduationCap className="w-4 h-4 mr-2" />
-                        <span>Birla Institute of Technology and Science</span>
+                        <span>Presidency University, Bangalore</span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <MapPin className="w-4 h-4 mr-2" />
