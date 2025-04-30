@@ -5,27 +5,65 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
+import { Checkbox } from './ui/checkbox';
 
 const Contacts = () => {
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' });
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSending(true);
     
-    // Simulate sending message
-    setTimeout(() => {
-      setMessage('');
-      setEmail('');
-      setName('');
-      setSubject('');
+    setSending(true);
+    setFormStatus({ type: '', message: '' });
+    
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('subject', subject);
+    formData.append('message', message);
+    formData.append('consent', consent ? 'Yes' : 'No');
+    
+    // Replace with your actual web3forms API key
+    formData.append('access_key', '41df86bc-2a63-4cca-9c0f-514628ac59b4');
+    
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setFormStatus({
+          type: 'success',
+          message: 'Thank you for your message! We will get back to you soon.'
+        });
+        setMessage('');
+        setEmail('');
+        setName('');
+        setSubject('');
+        setConsent(false);
+      } else {
+        setFormStatus({
+          type: 'error',
+          message: data.message || 'Something went wrong. Please try again.'
+        });
+      }
+    } catch (error) {
+      setFormStatus({
+        type: 'error',
+        message: 'An error occurred. Please try again later.'
+      });
+    } finally {
       setSending(false);
-      alert('Thank you for your message! We will get back to you soon.');
-    }, 1500);
+    }
   };
   
   return (
@@ -81,7 +119,7 @@ const Contacts = () => {
                           href="mailto:ai.poetry@gmail.com" 
                           className="hover:text-primary transition-colors"
                         >
-                          ai.poetry@gmail.com
+                         contact@airpoetrygenerator.com
                         </a>
                       </div>
                     </div>
@@ -151,6 +189,12 @@ const Contacts = () => {
                   <span>Send a Message</span>
                 </h2>
                 
+                {formStatus.message && (
+                  <div className={`p-3 rounded-md mb-4 ${formStatus.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                    {formStatus.message}
+                  </div>
+                )}
+                
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="name" className="text-gray-700">Name</Label>
@@ -198,6 +242,21 @@ const Contacts = () => {
                       className="w-full mt-1 p-2 min-h-[120px] focus:ring-2 focus:ring-primary/50"
                       placeholder="How can we help you?"
                     />
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="consent" 
+                      checked={consent}
+                      onCheckedChange={setConsent}
+                      className="mt-1"
+                    />
+                    <Label 
+                      htmlFor="consent" 
+                      className="text-sm text-gray-600 font-normal"
+                    >
+                      By filling out this feedback form, you agree to have your feedback published on the website. (Optional)
+                    </Label>
                   </div>
                   
                   <Button 
