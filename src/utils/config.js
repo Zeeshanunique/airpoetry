@@ -9,4 +9,4 @@ export const GOOGLE_API_KEY = "AIzaSyCeH5h33V5IiXHObE7733YqEvTjahhXYcM";
 export const GOOGLE_AI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 // Google AI model
-export const GOOGLE_AI_MODEL = "gemini-1.5-flash";
+export const GOOGLE_AI_MODEL = "gemini-2.5-pro";
