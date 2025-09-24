@@ -3,7 +3,7 @@
  */
 
 // Google API key
-export const GOOGLE_API_KEY = "AIzaSyBSL7buOnsbvEEl3tgNxGYQKDG4LeigPnQ";
+export const GOOGLE_API_KEY = "AIzaSyCeH5h33V5IiXHObE7733YqEvTjahhXYcM";
 
 // API endpoints
 export const GOOGLE_AI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
