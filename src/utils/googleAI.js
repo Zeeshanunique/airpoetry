@@ -1,8 +1,9 @@
 /**
- * Google Generative AI direct integration for poetry generation
+ * Google Generative AI integration using official @google/genai SDK
  */
+import { GoogleGenAI } from '@google/genai';
 import { SONNET_TEMPLATE, ODE_TEMPLATE, FREE_VERSE_TEMPLATE } from './poetryTypes';
-import { GOOGLE_AI_MODEL, GOOGLE_AI_ENDPOINT } from './config';
+import { GOOGLE_AI_MODEL } from './config';
 
 // Create a class to handle Google Generative AI integration
 export class GoogleGenerativeAI {
@@ -12,7 +13,7 @@ export class GoogleGenerativeAI {
     }
     this.apiKey = apiKey;
     this.model = GOOGLE_AI_MODEL;
-    this.endpoint = GOOGLE_AI_ENDPOINT;
+    this.ai = new GoogleGenAI({ apiKey: this.apiKey });
     console.log("GoogleGenerativeAI initialized with model:", this.model);
   }
 
@@ -67,54 +68,54 @@ export class GoogleGenerativeAI {
 
     console.log("Prepared prompt for Google AI");
     
-    // Call Google Generative AI API
+    // Call Google Generative AI API using official SDK
     try {
-      const apiUrl = `${this.endpoint}/${this.model}:generateContent?key=${this.apiKey}`;
-      console.log("Making API request to:", apiUrl.replace(this.apiKey, "API_KEY_HIDDEN"));
+      console.log("Making API request using official SDK");
       
-      const requestBody = {
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }]
-          }
-        ],
+      const response = await this.ai.models.generateContent({
+        model: this.model,
+        contents: prompt,
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 800,
         }
-      };
-      
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
       });
 
-      console.log("API response status:", response.status);
-      
-      if (!response.ok) {
-        const errorDetails = await response.json();
-        console.error("API error details:", errorDetails);
-        throw new Error(`Google AI API Error: ${errorDetails.error?.message || response.statusText}`);
-      }
-
-      const data = await response.json();
       console.log("API response received successfully");
+      console.log("Full response:", response);
+      console.log("Response candidates:", response.candidates);
       
       // Extract the poem text from the response
-      if (data.candidates && data.candidates.length > 0 && 
-          data.candidates[0].content && 
-          data.candidates[0].content.parts && 
-          data.candidates[0].content.parts.length > 0) {
-        const poemText = data.candidates[0].content.parts[0].text;
+      let poemText = null;
+      
+      // Try to get text from response.text first (if available)
+      if (response.text) {
+        poemText = response.text;
+        console.log("Found text in response.text:", poemText);
+      }
+      // Otherwise, extract from candidates array
+      else if (response.candidates && response.candidates.length > 0) {
+        const candidate = response.candidates[0];
+        console.log("First candidate:", candidate);
+        
+        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+          poemText = candidate.content.parts[0].text;
+          console.log("Found text in candidate.content.parts[0].text:", poemText);
+        } else if (candidate.text) {
+          poemText = candidate.text;
+          console.log("Found text in candidate.text:", poemText);
+        } else {
+          console.log("Candidate structure:", JSON.stringify(candidate, null, 2));
+        }
+      }
+      
+      if (poemText) {
         console.log("Successfully extracted poem text from response");
         return poemText;
       } else {
-        console.error("Unexpected API response format:", data);
-        throw new Error("Unexpected response format from Google AI API");
+        console.error("No text found in response. Full response structure:");
+        console.error(JSON.stringify(response, null, 2));
+        throw new Error("No poem text found in Google AI API response");
       }
     } catch (error) {
       console.error("Error generating poem with Google AI:", error);
