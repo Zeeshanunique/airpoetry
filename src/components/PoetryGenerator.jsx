@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Leaf, Wind, AlertCircle, Download, Share2, BookOpen, Cloud, Sparkles, Globe } from "lucide-react";
 import { generateMockPoem } from "../utils/mockPoetryGenerator";
+import { translateText } from "../utils/translator";
 import { generatePoetry } from '../utils/api';
 import { GOOGLE_API_KEY } from '../utils/config';
 
@@ -203,7 +204,16 @@ const PoetryGenerator = () => {
     return 100; // Default
   };
 
-  const translatePoem = (language) => {
+  const translatePoem = async (language) => {
+    // Normalize if a click event object was passed instead of language
+    if (language && typeof language === 'object') {
+      language = translationLanguage;
+    }
+
+    if (!language) {
+      return;
+    }
+
     if (language === "original") {
       setTranslatedPoem("");
       setTranslationLanguage("original");
@@ -211,8 +221,14 @@ const PoetryGenerator = () => {
     }
     
     setTranslationLanguage(language);
-    // Simulating translation
-    setTranslatedPoem(`[This is a simulated translation to ${language}]\n\n${poem}`);
+    try {
+      const sourceText = translatedPoem && translationLanguage !== "original" ? translatedPoem : poem;
+      const translated = await translateText(sourceText, language);
+      setTranslatedPoem(translated);
+    } catch (e) {
+      console.error('Translation failed:', e);
+      setTranslatedPoem(`[Translation failed, showing original]\n\n${poem}`);
+    }
   };
 
   const handleSharePoem = () => {
@@ -741,7 +757,7 @@ const PoetryGenerator = () => {
                   <Button 
                     variant="outline" 
                     className="w-full border-forest-green text-forest-green hover:bg-forest-green/10 transition-colors"
-                    onClick={translatePoem}
+                    onClick={() => translatePoem(translationLanguage)}
                     disabled={translationLanguage === ""}
                   >
                     <div className="flex items-center justify-center">
