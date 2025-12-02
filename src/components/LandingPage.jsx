@@ -1,536 +1,549 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion';
-import { ArrowRight, Book, Cloud, Cpu, Wind, Leaf, Database, Zap, AlertTriangle } from 'lucide-react';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { 
+  ArrowRight, 
+  Wind, 
+  Leaf, 
+  BookOpen, 
+  Sparkles, 
+  Globe2, 
+  Users, 
+  BarChart3,
+  ChevronDown,
+  Quote,
+  Play,
+  Feather,
+  TreePine,
+  CloudRain
+} from 'lucide-react';
 import PageTransition from './ui/PageTransition';
 
-const LandingPage = () => {
-  const [particleCount, setParticleCount] = useState(0);
-  const controls = useAnimation();
+// Animated counter component
+const AnimatedCounter = ({ end, duration = 2, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
-  // Animation variants for staggered animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  // Floating elements for subtle design
-  const floatingElements = [
-    { id: 1, icon: <Leaf />, delay: 0, duration: 15, size: 'w-12 h-12', position: 'top-20 left-10', color: 'text-primary/10' },
-    { id: 2, icon: <Cloud />, delay: 2, duration: 18, size: 'w-16 h-16', position: 'bottom-40 right-20', color: 'text-gray-400/10' },
-    { id: 3, icon: <Wind />, delay: 1, duration: 12, size: 'w-14 h-14', position: 'top-40 right-10', color: 'text-primary/10' },
-    { id: 4, icon: <Leaf />, delay: 3, duration: 20, size: 'w-8 h-8', position: 'bottom-20 left-20', color: 'text-primary/10' },
-    { id: 5, icon: <Cpu />, delay: 2, duration: 16, size: 'w-10 h-10', position: 'top-60 right-40', color: 'text-primary/10' },
-    { id: 6, icon: <Database />, delay: 4, duration: 14, size: 'w-12 h-12', position: 'bottom-60 left-40', color: 'text-primary/10' },
-    { id: 7, icon: <AlertTriangle />, delay: 1.5, duration: 17, size: 'w-14 h-14', position: 'top-1/3 left-1/4', color: 'text-primary/10' },
-    { id: 8, icon: <Zap />, delay: 3.5, duration: 13, size: 'w-10 h-10', position: 'bottom-1/3 right-1/4', color: 'text-primary/10' },
-  ];
-
-  // Subtle background particles
   useEffect(() => {
-    // Determine particle count based on screen size
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width < 640) {
-        setParticleCount(10);
-      } else if (width < 1024) {
-        setParticleCount(15);
-      } else {
-        setParticleCount(20);
-      }
-    };
+    if (isInView) {
+      let start = 0;
+      const increment = end / (duration * 60);
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          setCount(end);
+          clearInterval(timer);
+        } else {
+          setCount(Math.floor(start));
+        }
+      }, 1000 / 60);
+      return () => clearInterval(timer);
+    }
+  }, [isInView, end, duration]);
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
-    // Start particle animation
-    controls.start({
-      opacity: [0.3, 0.5, 0.3],
-      scale: [1, 1.1, 1],
-      transition: { duration: 3, repeat: Infinity }
-    });
-    
-    return () => window.removeEventListener('resize', handleResize);
-  }, [controls]);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
+
+// Feature card component
+const FeatureCard = ({ icon: Icon, title, description, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay }}
+    viewport={{ once: true }}
+    className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden"
+  >
+    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-150 transition-transform duration-500" />
+    <div className="relative z-10">
+      <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+        <Icon className="w-7 h-7 text-white" />
+      </div>
+      <h3 className="text-xl font-serif font-bold text-gray-800 mb-3">{title}</h3>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
+    </div>
+  </motion.div>
+);
+
+// Stat card component
+const StatCard = ({ value, label, suffix = '', delay }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5, delay }}
+    viewport={{ once: true }}
+    className="text-center p-6"
+  >
+    <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+      <AnimatedCounter end={value} suffix={suffix} />
+    </div>
+    <div className="text-primary-100 text-sm uppercase tracking-wider">{label}</div>
+  </motion.div>
+);
+
+const LandingPage = () => {
+  const { scrollYProgress } = useScroll();
+  const heroRef = useRef(null);
+  
+  // Parallax effects
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
+  const features = [
+    {
+      icon: Wind,
+      title: "Real Pollution Data",
+      description: "Access comprehensive air quality measurements from monitoring stations across multiple cities, spanning years of environmental data."
+    },
+    {
+      icon: Sparkles,
+      title: "AI-Powered Poetry",
+      description: "Advanced Google Gemini AI transforms raw environmental data into evocative, meaningful poetry that captures the essence of our relationship with air."
+    },
+    {
+      icon: BookOpen,
+      title: "Multiple Poetry Forms",
+      description: "Choose from classical forms like Sonnets and Odes, or explore free verse—each tailored to express environmental themes uniquely."
+    },
+    {
+      icon: Globe2,
+      title: "Multilingual Support",
+      description: "Translate your generated poetry into multiple languages, spreading environmental awareness across cultural boundaries."
+    }
+  ];
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-white relative overflow-hidden">
-        {/* Subtle animated particles */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          {Array.from({ length: particleCount }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full bg-primary/5 pointer-events-none"
-              style={{
-                width: `${Math.random() * 6 + 2}px`,
-                height: `${Math.random() * 6 + 2}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              custom={i}
-              animate={controls}
-            />
-          ))}
-        </div>
-
-        {/* Floating elements - very subtle */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-          {floatingElements.map((element) => (
-            <motion.div
-              key={element.id}
-              className={`absolute ${element.position} ${element.size} ${element.color} pointer-events-none`}
-              initial={{ opacity: 0.3, y: 0, rotate: 0 }}
-              animate={{ 
-                opacity: [0.3, 0.5, 0.3],
-                y: [0, -20, 0],
-                rotate: [0, element.id % 2 === 0 ? 10 : -10, 0]
-              }}
-              transition={{ 
-                duration: element.duration, 
-                repeat: Infinity, 
-                ease: "easeInOut", 
-                delay: element.delay 
-              }}
+      <div className="min-h-screen bg-white overflow-hidden">
+        
+        {/* Hero Section */}
+        <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+            <motion.div 
+              style={{ y: y1 }}
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             >
-              {element.icon}
+              <img 
+                src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2560&auto=format&fit=crop"
+                alt="Forest with sunlight"
+                className="w-full h-full object-cover"
+              />
             </motion.div>
-          ))}
-        </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+          </div>
 
-        {/* Subtle gradient blobs */}
-        <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-          <motion.div
-            className="absolute w-[500px] h-[500px] rounded-full bg-primary/5 blur-3xl"
-            style={{ top: '-10%', right: '-10%' }}
-            animate={{
-              scale: [1, 1.2, 1],
-              x: [0, 30, 0],
-              y: [0, -30, 0],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              repeatType: "mirror",
-            }}
-          />
-          
-          <motion.div
-            className="absolute w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl"
-            style={{ bottom: '-15%', left: '-15%' }}
-            animate={{
-              scale: [1, 1.3, 1],
-              x: [0, -20, 0],
-              y: [0, 40, 0],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              repeatType: "mirror",
-              delay: 2,
-            }}
-          />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10">
-          {/* Hero Section - Google-like minimal design */}
-          <section className="py-16 md:py-24 lg:py-28 flex items-center justify-center">
-            <div className="container px-4 sm:px-6 lg:px-8 mx-auto">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-center max-w-3xl mx-auto"
-              >
-                <motion.h1 
-                  className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-gray-800 mb-5 tracking-tight"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.2 }}
-                >
-                  <motion.span 
-                    className="text-primary"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                  >
-                    AI
-                  </motion.span>
-                  <motion.span 
-                    className="relative mx-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                  >
-                    (R)
-                    <motion.div 
-                      className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"
-                      animate={{ 
-                        scale: [1, 1.5, 1],
-                        opacity: [0.7, 1, 0.7]
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </motion.span> Poetry Generator
-                </motion.h1>
-                <motion.h2 
-                  className="text-2xl md:text-3xl font-serif text-gray-700 mb-4 tracking-tight"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                  From Pollution to Poetry
-                </motion.h2>
-                <motion.p 
-                  className="text-md md:text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.7, delay: 0.5 }}
-                >
-                  An independent project at the intersection of literature, AI engineering, and ecology
-                </motion.p>
-                  
-                {/* Search bar style button - Google-inspired */}
-                <motion.div 
-                  className="max-w-xl mx-auto mb-10 relative"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
-                >
-                  <Link 
-                    to="/generate" 
-                    className="flex items-center justify-center w-full px-8 py-4 text-gray-700 bg-white border border-gray-300 rounded-full hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 group"
-                  >
-                    <span className="text-base md:text-lg font-medium">Transform air pollution data into poetry</span>
-                    <motion.div
-                      className="ml-2 text-primary"
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.2 }}
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                    </motion.div>
-                  </Link>
-                  <motion.div 
-                    className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"
-                    animate={{ opacity: [0.3, 0.7, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </motion.div>
-                  
-                {/* Action buttons - Google-inspired */}
-                <motion.div 
-                  className="flex flex-wrap justify-center gap-4 md:gap-6"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.8 }}
-                >
-                  <Link 
-                    to="/generate" 
-                    className="px-6 py-3 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md text-sm font-medium transition-colors hover:shadow-sm"
-                  >
-                    Generate Poetry
-                  </Link>
-                  <Link 
-                    to="/about" 
-                    className="px-6 py-3 bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-md text-sm font-medium transition-colors hover:shadow-sm"
-                  >
-                    About the Project
-                  </Link>
-                </motion.div>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Main Content Section - Google-inspired clean design */}
-          <section className="py-16 bg-gray-50 relative overflow-hidden">
-            {/* Animated background element */}
-            <motion.div 
-              className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-primary/5 opacity-30"
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, 0],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                repeatType: "mirror"
-              }}
-            />
-            
-            <div className="container px-4 sm:px-6 lg:px-8 mx-auto relative z-10">
-              <div className="max-w-3xl mx-auto">
-                {/* Rising Air Pollution Section */}
-                <motion.div 
-                  className="mb-16"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-gray-800 mb-6 tracking-tight">Rising Air Pollution? Rising Awareness Needed.</h2>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    Air pollution is one of the leading causes of serious health issues in many parts of the world, particularly in areas marked by high industrial activity and population density.<sup className="text-primary">[1]</sup> Often invisible to the human eye, air pollution can be easily ignored, despite its evident harmful effects on both human health and the environment.
-                  </p>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    How can awareness of this issue be raised in ways that foster new individual and collective behaviors, helping to reshape development patterns toward a more sustainable future?
-                  </p>
-                  
-                  {/* Animated pollution indicator */}
-                  <motion.div className="my-10 h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-gradient-to-r from-primary/40 to-primary/60"
-                      initial={{ width: '10%' }}
-                      animate={{ width: ['30%', '70%', '40%'] }}
-                      transition={{ duration: 8, repeat: Infinity, repeatType: "reverse" }}
-                    />
-                  </motion.div>
-                </motion.div>
-                
-                {/* Literature as a Way Section */}
-                <motion.div 
-                  className="mb-16"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-gray-800 mb-6 tracking-tight">(AI) Literature as a Way</h2>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    Literature has long been acknowledged as a powerful tool for fostering affective engagement with a wide range of topics and existential concerns. In recent decades, its potential to address the challenges of climate change has been increasingly explored, particularly through the rise of ecocriticism. Poetry, in particular, offers a distinctive means of encouraging reflection, critical thinking, and a sense of human-nonhuman attunement. In this context, ecopoetics becomes essential in supporting the transformative social processes required to confront the profound ethical challenges posed by sustainable development.
-                  </p>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    Air pollution has a persistent presence in literary history, especially since the Industrial Revolution, which introduced imagery of toxic air, black smoke, and environmental degradation in multiple works. While these images continue permeating contemporary poetry, in an era of global transformation and systemic crisis, new narratives are needed—not only to inform about ever-new challenges related to poor air quality, but to inspire ever-new change in our relationship with both the human and the more-than-human world.
-                  </p>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    We believe that AI plays a key role in this effort—both by making pollution a subject of poetry, and also by embedding it into the creative process itself. As AI text generation evolves, we see pollutants not only as harmful agents affecting human and ecological health, but also as generative elements within poetic production—shaping the critical lens through which our poems engage with the issue of air pollution.
-                  </p>
-                  
-                  {/* Animated text lines */}
-                  <div className="my-10 space-y-2">
-                    {[1, 2, 3].map((line) => (
-                      <motion.div 
-                        key={line}
-                        className="h-1.5 bg-gray-100 rounded-full"
-                        initial={{ width: `${70 + Math.random() * 30}%` }}
-                        animate={{ opacity: [0.5, 0.8, 0.5] }}
-                        transition={{ duration: 2 + line, repeat: Infinity, repeatType: "reverse" }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-                
-                {/* Project Vision Section */}
-                <motion.div 
-                  className="mb-16"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  viewport={{ once: true }}
-                >
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold text-gray-800 mb-6 tracking-tight">A Project. A Vision. A Mission… in Progress.</h2>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    This project is our creative, affirmative, and proactive response to data that might otherwise leave us feeling discouraged and overwhelmed by the scale of climate change, its causes, and its consequences. Through this participatory and collective project of poetry generation that keeps the root causes of air pollution at its core, we aim to inspire active engagement for change—to think, feel, and rewrite the future of our communities and cities.
-                  </p>
-                  <p className="text-gray-600 mb-5 leading-relaxed text-lg">
-                    Our project is both in progress and ongoing. We have already presented our work at conferences and are currently developing further research, while exploring new implementation strategies to expand and strengthen our impact.
-                  </p>
-                  <p className="text-gray-600 mb-6 leading-relaxed text-lg">
-                    Would you like to support the initiative? Contact us to collaborate or join the team.
-                  </p>
-                  
-                  {/* Animated AI network */}
-                  <div className="my-10 relative h-10">
-                    {[1, 2, 3, 4, 5].map((node) => (
-                      <motion.div 
-                        key={node}
-                        className="absolute w-2 h-2 bg-primary rounded-full"
-                        style={{ 
-                          left: `${node * 20}%`, 
-                          top: node % 2 === 0 ? '20%' : '60%' 
-                        }}
-                        animate={{ 
-                          scale: [1, 1.5, 1],
-                          opacity: [0.5, 1, 0.5]
-                        }}
-                        transition={{ 
-                          duration: 1.5, 
-                          repeat: Infinity,
-                          delay: node * 0.2
-                        }}
-                      />
-                    ))}
-                    {[1, 2, 3, 4].map((line) => (
-                      <motion.div 
-                        key={`line-${line}`}
-                        className="absolute h-0.5 bg-primary/30"
-                        style={{ 
-                          left: `${line * 20 + 1}%`,
-                          top: line % 2 === 0 ? '22%' : '62%',
-                          width: '18%',
-                          transformOrigin: 'left center'
-                        }}
-                        animate={{ opacity: [0.2, 0.5, 0.2] }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity,
-                          delay: line * 0.2
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-                
-                {/* Reference */}
-                <motion.div 
-                  className="text-sm text-gray-500 mt-12 border-t border-gray-200 pt-8"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  <p>
-                    [1] See World Health Organization, <a href="https://www.who.int/health-topics/air-pollution#tab=tab_1" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">https://www.who.int/health-topics/air-pollution#tab=tab_1</a>
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </section>
-
-          {/* CTA Section - Clean and minimal with subtle animations */}
-          <section className="py-20 bg-white border-t border-gray-100 relative overflow-hidden">
-            {/* Subtle animated background */}
-            <motion.div 
-              className="absolute bottom-20 right-1/4 w-72 h-72 rounded-full bg-primary/5 opacity-20"
-              animate={{
-                scale: [1, 1.1, 1],
-                x: [0, 30, 0],
-              }}
-              transition={{
-                duration: 18,
-                repeat: Infinity,
-                repeatType: "mirror"
-              }}
-            />
-            
-            {/* Subtle particles */}
-            {Array.from({ length: 5 }).map((_, i) => (
+          {/* Animated particles */}
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+            {Array.from({ length: 20 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-2 h-2 rounded-full bg-primary/10"
+                className="absolute w-1 h-1 bg-white/30 rounded-full"
                 style={{
-                  top: `${Math.random() * 100}%`,
                   left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
                 }}
                 animate={{
-                  y: [0, Math.random() * -50 - 20, 0],
-                  opacity: [0, 0.5, 0]
+                  y: [0, -100, 0],
+                  opacity: [0, 1, 0],
                 }}
                 transition={{
-                  duration: 5 + Math.random() * 10,
+                  duration: 5 + Math.random() * 5,
                   repeat: Infinity,
-                  delay: Math.random() * 5
+                  delay: Math.random() * 5,
                 }}
               />
             ))}
-            
-            <div className="container px-4 sm:px-6 lg:px-8 mx-auto text-center relative z-10">
+          </div>
+
+          {/* Hero Content */}
+          <motion.div 
+            style={{ opacity }}
+            className="relative z-20 text-center px-4 max-w-5xl mx-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-8 border border-white/20">
+                <Leaf className="inline w-4 h-4 mr-2" />
+                Where Environment Meets Literature
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 leading-tight"
+            >
+              <span className="text-primary-200">AI</span>(R) Poetry
+              <br />
+              <span className="text-3xl md:text-5xl lg:text-6xl font-light">Generator</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-xl md:text-2xl text-white/80 mb-10 max-w-3xl mx-auto leading-relaxed"
+            >
+              Transform air pollution data into meaningful poetry through the intersection of 
+              <span className="text-primary-200 font-medium"> technology</span>, 
+              <span className="text-primary-200 font-medium"> literature</span>, and 
+              <span className="text-primary-200 font-medium"> ecology</span>
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Link
+                to="/generate"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-primary text-white rounded-full font-medium text-lg hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                <Feather className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                Start Creating Poetry
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                to="/about"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-medium text-lg hover:bg-white/20 transition-all duration-300 border border-white/30"
+              >
+                Learn More
+              </Link>
+            </motion.div>
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+          >
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex flex-col items-center text-white/60"
+            >
+              <span className="text-sm mb-2">Scroll to explore</span>
+              <ChevronDown className="w-6 h-6" />
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="relative py-16 bg-gradient-to-r from-primary to-primary/90 overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
+          </div>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <StatCard value={730} suffix="+" label="Days of Data" delay={0} />
+              <StatCard value={2} label="Cities Covered" delay={0.1} />
+              <StatCard value={3} label="Pollutant Types" delay={0.2} />
+              <StatCard value={5} label="Languages" delay={0.3} />
+            </div>
+          </div>
+        </section>
+
+        {/* Mission Section with Image */}
+        <section className="py-24 bg-gray-50 relative overflow-hidden">
+          <motion.div 
+            style={{ y: y2 }}
+            className="absolute -top-20 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+          />
+          
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Image */}
               <motion.div
-                className="max-w-2xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img
+                    src="https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=1470&auto=format&fit=crop"
+                    alt="Nature landscape"
+                    className="w-full h-[500px] object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  
+                  {/* Floating quote */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    viewport={{ once: true }}
+                    className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur rounded-xl p-6 shadow-lg"
+                  >
+                    <Quote className="w-8 h-8 text-primary/30 mb-2" />
+                    <p className="text-gray-700 italic font-serif">
+                      "Poetry is the breath of the Earth, transformed into words that awaken our connection to the natural world."
+                    </p>
+                  </motion.div>
+                </div>
+
+                {/* Decorative elements */}
+                <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-primary/20 rounded-2xl -z-10" />
+                <div className="absolute -top-6 -right-6 w-32 h-32 border-2 border-primary/20 rounded-2xl -z-10" />
+              </motion.div>
+
+              {/* Content */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
               >
-                <motion.div 
-                  className="mb-10"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="inline-block bg-primary/10 px-4 py-1 rounded-full mb-4">
-                    <p className="text-primary font-medium text-sm">Free & No Registration Required</p>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-800 mb-4 tracking-tight">
-                    Start Generating Poetry Now
-                  </h2>
-                  <p className="text-lg text-gray-600">
-                    Our software transforms air quality data into meaningful poetry
+                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+                  Our Mission
+                </span>
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-6 leading-tight">
+                  From Pollution to Poetry
+                </h2>
+                <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
+                  <p>
+                    Air pollution affects millions worldwide, yet remains largely invisible to the naked eye. 
+                    We believe that <strong className="text-gray-800">poetry can make the invisible visible</strong>—transforming 
+                    raw environmental data into emotional experiences that inspire action.
                   </p>
-                </motion.div>
-                
-                <motion.div
-                  className="mb-10"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link 
-                    to="/generate" 
-                    className="inline-flex items-center justify-center px-8 py-4 font-medium text-white bg-primary rounded-md hover:bg-primary-600 transition-colors shadow-md"
-                  >
-                    <motion.span
-                      className="text-lg"
-                      animate={{ x: [0, 2, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror" }}
-                    >
-                      CLICK HERE to start AI generating poetry
-                    </motion.span> 
-                    <motion.div
-                      animate={{ x: [0, 3, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "mirror", delay: 0.2 }}
-                    >
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </motion.div>
-                  </Link>
-                </motion.div>
-                
-                {/* Animated button glow effect */}
-                <motion.div 
-                  className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent bottom-0 left-0 right-0"
-                  style={{ width: '100%', maxWidth: '384px', margin: '0 auto' }}
-                  animate={{
-                    opacity: [0.3, 0.6, 0.3]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "mirror"
-                  }}
-                />
-                
-                <motion.p 
-                  className="text-sm text-gray-500 mt-4"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  viewport={{ once: true }}
-                >
-                  Our software is free and does not require registration
-                </motion.p>
+                  <p>
+                    Through the intersection of AI technology and literary tradition, we create 
+                    <strong className="text-gray-800"> ecopoetry</strong> that speaks to the heart while informing the mind.
+                  </p>
+                </div>
+
+                <div className="mt-10 flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <TreePine className="w-5 h-5 text-primary" />
+                    </div>
+                    <span>Environmental Awareness</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                    </div>
+                    <span>Literary Innovation</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                    </div>
+                    <span>AI Technology</span>
+                  </div>
+                </div>
               </motion.div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-24 bg-white relative">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+                How It Works
+              </span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-6">
+                The Art of Environmental Poetry
+              </h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Our platform combines cutting-edge AI with environmental data to create 
+                meaningful poetry that raises awareness about air quality.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {features.map((feature, index) => (
+                <FeatureCard key={index} {...feature} delay={index * 0.1} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Process Section */}
+        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+          <div className="absolute inset-0">
+            <img
+              src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?q=80&w=2051&auto=format&fit=crop"
+              alt="Night sky"
+              className="w-full h-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/95 to-gray-900/90" />
+          </div>
+
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <span className="inline-block px-4 py-1 bg-white/10 text-white rounded-full text-sm font-medium mb-4">
+                  The Process
+                </span>
+                <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 leading-tight">
+                  Data Becomes Art
+                </h2>
+                <p className="text-xl text-gray-300 mb-10 leading-relaxed">
+                  Watch as environmental data transforms into evocative poetry through our 
+                  AI-powered creative process.
+                </p>
+
+                <div className="space-y-6">
+                  {[
+                    { step: "01", title: "Select Location & Time", desc: "Choose a city and date range from our pollution database" },
+                    { step: "02", title: "AI Analysis", desc: "Our AI analyzes pollution patterns and environmental context" },
+                    { step: "03", title: "Poetry Generation", desc: "Meaningful verses emerge from the data, reflecting environmental realities" },
+                    { step: "04", title: "Share & Inspire", desc: "Download, translate, and share your poetry with the world" }
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="flex gap-4"
+                    >
+                      <div className="flex-shrink-0 w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold">
+                        {item.step}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white mb-1">{item.title}</h4>
+                        <p className="text-gray-400">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 border border-gray-700 shadow-2xl">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <div className="font-mono text-sm">
+                    <div className="text-gray-500 mb-4">// Sample Generated Poetry</div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      viewport={{ once: true }}
+                      className="text-primary-300 italic leading-relaxed"
+                    >
+                      <p className="mb-2">"Through Bergamo's ancient streets,</p>
+                      <p className="mb-2">where morning mist and particles meet,</p>
+                      <p className="mb-2">the air tells stories, soft and low,</p>
+                      <p className="mb-2">of progress paid with skies of woe.</p>
+                      <p className="mb-2">Yet hope rises with each dawn,</p>
+                      <p>as nature's breath carries on..."</p>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Floating elements */}
+                <motion.div
+                  animate={{ y: [-10, 10, -10] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute -top-4 -right-4 w-16 h-16 bg-primary/30 rounded-full blur-xl"
+                />
+                <motion.div
+                  animate={{ y: [10, -10, 10] }}
+                  transition={{ duration: 5, repeat: Infinity }}
+                  className="absolute -bottom-4 -left-4 w-20 h-20 bg-primary/20 rounded-full blur-xl"
+                />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white" />
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="max-w-4xl mx-auto text-center"
+            >
+              <motion.div
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 5, repeat: Infinity }}
+                className="inline-block mb-8"
+              >
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <Feather className="w-10 h-10 text-primary" />
+                </div>
+              </motion.div>
+
+              <h2 className="text-4xl md:text-6xl font-serif font-bold text-gray-800 mb-6">
+                Ready to Create?
+              </h2>
+              <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                Start transforming air pollution data into meaningful poetry. 
+                Free to use, no registration required.
+              </p>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  to="/generate"
+                  className="group inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-primary to-primary/90 text-white rounded-full font-medium text-xl hover:shadow-2xl transition-all duration-300 shadow-lg"
+                >
+                  <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
+                  Start Generating Poetry
+                  <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
+                </Link>
+              </motion.div>
+
+              <p className="mt-6 text-gray-500 text-sm">
+                Join thousands who have transformed data into art
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Reference Section */}
+        <section className="py-8 bg-gray-100 border-t border-gray-200">
+          <div className="container mx-auto px-4">
+            <p className="text-sm text-gray-500 text-center">
+              Data source: World Health Organization. 
+              <a href="https://www.who.int/health-topics/air-pollution" className="text-primary hover:underline ml-1" target="_blank" rel="noopener noreferrer">
+                Learn more about air pollution →
+              </a>
+            </p>
+          </div>
+        </section>
       </div>
     </PageTransition>
   );

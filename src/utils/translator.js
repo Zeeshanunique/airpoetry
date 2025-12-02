@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2025 AI(R) Poetry. All rights reserved.
+ *
+ * This source code is licensed under the proprietary license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import { GoogleGenAI } from '@google/genai';
 import { GOOGLE_API_KEY, GOOGLE_AI_MODEL } from './config';
 

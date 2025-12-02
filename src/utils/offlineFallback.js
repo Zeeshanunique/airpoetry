@@ -6,16 +6,20 @@
  */
 
 /**
- * Mock poetry generator for when the API server is down
+ * Offline Fallback Generator (Resilience Strategy)
  * 
- * This function generates a mock poem when the API is unavailable.
- * For Sonnets, it will always generate 14 lines regardless of poemLength parameter.
- * For other poem types, the mock templates have fixed lengths but the parameter is passed
- * to maintain consistency with the API interface.
+ * This module provides a deterministic fallback mechanism for generating poetry
+ * when the primary AI service is unavailable (network issues, API limits, etc.).
+ * 
+ * RESILIENCE STRATEGY:
+ * 1. Detects API failure in the primary service layer.
+ * 2. Switches to a local, template-based generation engine.
+ * 3. Uses the same input parameters (city, pollutant, data) to fill pre-structured 
+ *    templates that mimic the structure of the intended output.
+ * 4. Ensures the user always receives a "product" even in total system failure.
  */
 
-export const generateMockPoem = (poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength = 14) => {
-  // Note: The mock poems have fixed structures, but we accept poemLength to match the API interface
+export const generateOfflineFallbackPoem = (poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength = 14) => {
   // Format dates for readability
   const formattedFromDate = new Date(fromDate).toLocaleDateString('en-US', { 
     year: 'numeric', month: 'long', day: 'numeric' 
@@ -37,7 +41,7 @@ export const generateMockPoem = (poemType, city, pollutant, avgPollutionRate, fr
   // Generate different templates based on poem type
   switch(poemType) {
     case "Sonnet":
-      return `[Mock ${poemType} - API Server Unavailable]
+      return `[Offline Mode - Network Resilience Active]
 
 The air in ${city} bears a silent weight,
 As ${pollutant} particles drift unseen,
@@ -58,7 +62,7 @@ Our future bound by choices that we make,
 The quality of air, for all our sake.`;
 
     case "Ode":
-      return `[Mock ${poemType} - API Server Unavailable]
+      return `[Offline Mode - Network Resilience Active]
 
 O Air of ${city}, once clear and bright,
 Now bearing ${pollutant} in your invisible embrace,
@@ -80,7 +84,7 @@ Between our comfort and our common wealth.`;
 
     case "Free Verse":
     default:
-      return `[Mock ${poemType} - API Server Unavailable]
+      return `[Offline Mode - Network Resilience Active]
 
 In ${city}
     the particles of ${pollutant} drift
@@ -108,4 +112,4 @@ The air connects us all
 in this breathing world
     where every molecule matters`;
   }
-}; 
+};

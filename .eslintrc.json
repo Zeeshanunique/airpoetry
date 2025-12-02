@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "react-app",
+    "react-app/jest",
+    "prettier"
+  ],
+  "rules": {
+    "react/prop-types": "warn",
+    "react/react-in-jsx-scope": "off",
+    "no-console": ["warn", { "allow": ["error", "warn"] }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "prefer-const": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

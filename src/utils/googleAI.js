@@ -1,5 +1,15 @@
 /**
+ * Copyright (c) 2025 AI(R) Poetry. All rights reserved.
+ *
+ * This source code is licensed under the proprietary license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
  * Google Generative AI integration using official @google/genai SDK
+ * 
+ * This module encapsulates the proprietary method for transforming quantitative
+ * environmental data into qualitative literary output.
  */
 import { GoogleGenAI } from '@google/genai';
 import { SONNET_TEMPLATE, ODE_TEMPLATE, FREE_VERSE_TEMPLATE } from './poetryTypes';
@@ -14,16 +24,30 @@ export class GoogleGenerativeAI {
     this.apiKey = apiKey;
     this.model = GOOGLE_AI_MODEL;
     this.ai = new GoogleGenAI({ apiKey: this.apiKey });
-    console.log("GoogleGenerativeAI initialized with model:", this.model);
   }
 
   /**
-   * Generate a poem using Google Generative AI
+   * Generates a poem by transforming environmental data into natural language constraints.
+   *
+   * METHOD:
+   * 1. Normalizes pollution data (avgPollutionRate) against standard thresholds.
+   * 2. Maps the normalized value to a specific "emotional tone" (pleasing, critical, etc.).
+   * 3. Constructs a prompt that enforces strict structural constraints (length, form)
+   *    while allowing creative freedom within the thematic boundaries of the city and pollution data.
+   * 4. Injects the specific "pollutant" type as a thematic element (invisible actor).
+   *
+   * @param {Object} options - The configuration for the poem generation.
+   * @param {string} options.poemType - The literary form (Sonnet, Ode, Free Verse).
+   * @param {string} options.city - The target location for the poem's setting.
+   * @param {string} options.pollutant - The specific pollutant (PM10, PM2.5, NO2) acting as the muse.
+   * @param {number} options.length - The target line count (strict constraint).
+   * @param {number} options.avgPollutionRate - The calculated average pollution level used to determine tone.
+   * @param {Date|string} options.fromDate - The start of the data collection period.
+   * @param {Date|string} options.toDate - The end of the data collection period.
+   * @returns {Promise<string>} The generated poem text.
    */
   async generatePoem(options) {
     const { poemType, city, pollutant, length = 14, avgPollutionRate, fromDate, toDate } = options;
-    
-    console.log("Generating poem with options:", { poemType, city, pollutant, length, avgPollutionRate });
     
     // Format dates
     const startDate = new Date(fromDate);
@@ -32,12 +56,13 @@ export class GoogleGenerativeAI {
     const formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     // Determine tone based on pollution rate
+    // This mapping is a key part of the inventive step: converting data -> emotion
     const tone = avgPollutionRate < 12 ? "pleasing" :
                  avgPollutionRate < 36 ? "low criticism" :
                  avgPollutionRate < 56 ? "moderate and critical" :
                  "more critical and rough";
 
-    // Base prompt
+    // Base prompt construction
     let prompt = `
     Compose a ${poemType.toLowerCase()} about ${city}, reflecting on its unique atmosphere, history, and culture. 
     The poem must be ${length} lines long.
@@ -65,13 +90,9 @@ export class GoogleGenerativeAI {
       default:
         break;
     }
-
-    console.log("Prepared prompt for Google AI");
     
     // Call Google Generative AI API using official SDK
     try {
-      console.log("Making API request using official SDK");
-      
       const response = await this.ai.models.generateContent({
         model: this.model,
         contents: prompt,
@@ -81,40 +102,27 @@ export class GoogleGenerativeAI {
         }
       });
 
-      console.log("API response received successfully");
-      console.log("Full response:", response);
-      console.log("Response candidates:", response.candidates);
-      
       // Extract the poem text from the response
       let poemText = null;
       
       // Try to get text from response.text first (if available)
       if (response.text) {
         poemText = response.text;
-        console.log("Found text in response.text:", poemText);
       }
       // Otherwise, extract from candidates array
       else if (response.candidates && response.candidates.length > 0) {
         const candidate = response.candidates[0];
-        console.log("First candidate:", candidate);
         
         if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
           poemText = candidate.content.parts[0].text;
-          console.log("Found text in candidate.content.parts[0].text:", poemText);
         } else if (candidate.text) {
           poemText = candidate.text;
-          console.log("Found text in candidate.text:", poemText);
-        } else {
-          console.log("Candidate structure:", JSON.stringify(candidate, null, 2));
         }
       }
       
       if (poemText) {
-        console.log("Successfully extracted poem text from response");
         return poemText;
       } else {
-        console.error("No text found in response. Full response structure:");
-        console.error(JSON.stringify(response, null, 2));
         throw new Error("No poem text found in Google AI API response");
       }
     } catch (error) {
@@ -122,4 +130,4 @@ export class GoogleGenerativeAI {
       throw error;
     }
   }
-} 
+}
