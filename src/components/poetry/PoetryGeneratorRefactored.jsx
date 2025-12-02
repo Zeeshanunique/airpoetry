@@ -16,6 +16,7 @@ import GeneratorControls from "./GeneratorControls";
 import PollutionDisplay from "./PollutionDisplay";
 import PoemDisplay from "./PoemDisplay";
 import { usePollutionData } from "../../hooks/usePollutionData";
+import { usePollutionDataWithToggle, DATA_SOURCE } from "../../hooks/usePollutionDataWithToggle";
 import { usePoetryGenerator } from "../../hooks/usePoetryGenerator";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useKeyboardShortcuts, useShortcutHints } from "../../hooks/useKeyboardShortcuts";
@@ -27,6 +28,7 @@ const PoetryGeneratorRefactored = () => {
   // Form state
   const [poemType, setPoemType] = useState(POEM_TYPES.SONNET);
   const [city, setCity] = useState("Bergamo");
+  const [customCity, setCustomCity] = useState("");
   const [pollutant, setPollutant] = useState(POLLUTANTS.PM10);
   // Use explicit year, month (0-indexed), day to avoid timezone issues
   const [fromDate, setFromDate] = useState(new Date(2022, 0, 1));
@@ -35,6 +37,9 @@ const PoetryGeneratorRefactored = () => {
   const [feedbackText, setFeedbackText] = useState("");
   const [isExplanationVisible, setIsExplanationVisible] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+
+  // Data source toggle state
+  const [dataSource, setDataSource] = useState(DATA_SOURCE.HISTORICAL);
 
   // Toast notifications
   const toast = useToast();
@@ -46,11 +51,33 @@ const PoetryGeneratorRefactored = () => {
   const { shortcuts: shortcutHints } = useShortcutHints();
   const [showShortcuts, setShowShortcuts] = useState(false);
 
-  // Custom hooks
-  const { avgPollutionRate } = usePollutionData(city, pollutant, fromDate, toDate);
+  // Custom hooks - use the appropriate hook based on data source
+  const historicalData = usePollutionData(city, pollutant, fromDate, toDate);
+  const liveData = usePollutionDataWithToggle(city, pollutant, fromDate, toDate, dataSource);
+
+  // Select the appropriate data based on toggle
+  const { avgPollutionRate, loading: dataLoading, error: dataError, locationInfo } = 
+    dataSource === DATA_SOURCE.HISTORICAL ? historicalData : liveData;
+
   const { poem, loading: poemLoading, error: poemError, generate } = usePoetryGenerator();
   const { translatedText, loading: translationLoading, translate } = useTranslation(poem);
   const [translationLanguage, setTranslationLanguage] = useState("original");
+
+  // Update dates when switching data source
+  useEffect(() => {
+    if (dataSource === DATA_SOURCE.LIVE) {
+      // Set dates to last 30 days for live data
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      setFromDate(thirtyDaysAgo);
+      setToDate(today);
+    } else {
+      // Reset to historical defaults
+      setFromDate(new Date(2022, 0, 1));
+      setToDate(new Date(2023, 11, 31));
+    }
+  }, [dataSource]);
 
   // Update poem length based on poem type
   useEffect(() => {
@@ -61,6 +88,12 @@ const PoetryGeneratorRefactored = () => {
     // Validate date range before generating
     if (!isDateRangeValid) {
       toast.error("Please fix the date range errors before generating");
+      return;
+    }
+
+    // Check if data is still loading
+    if (dataLoading) {
+      toast.error("Please wait for pollution data to load");
       return;
     }
 
@@ -87,7 +120,7 @@ const PoetryGeneratorRefactored = () => {
         },
       });
     }
-  }, [poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength, generate, isDateRangeValid, toast]);
+  }, [poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength, generate, isDateRangeValid, toast, dataLoading]);
 
   const handleDownload = useCallback(() => {
     const poemToDownload = translatedText || poem;
@@ -352,9 +385,8 @@ const PoetryGeneratorRefactored = () => {
                       </h3>
                       <div className="h-0.5 w-12 bg-primary/30 mb-4 group-hover:w-16 transition-all"></div>
                       <p className="text-gray-700 leading-relaxed">
-                        We gather historical air pollution data (PM10, PM2.5, NO2) from monitoring
-                        stations in selected cities. This data forms the environmental context that
-                        inspires our AI poetry generation system.
+                        We gather air pollution data (PM10, PM2.5, NO2) from monitoring
+                        stations worldwide. Choose between historical data or real-time live API data.
                       </p>
                     </motion.div>
 
@@ -417,12 +449,24 @@ const PoetryGeneratorRefactored = () => {
       >
         {/* Left Column */}
         <div className="space-y-6">
-          <Card className="border border-primary/20 shadow-xl bg-white relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/60 to-primary/20"></div>
+          <Card className={`border shadow-xl bg-white relative overflow-hidden ${
+            dataSource === DATA_SOURCE.LIVE 
+              ? 'border-emerald-300' 
+              : 'border-primary/20'
+          }`}>
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
+              dataSource === DATA_SOURCE.LIVE 
+                ? 'from-emerald-500/60 to-emerald-500/20' 
+                : 'from-primary/60 to-primary/20'
+            }`}></div>
             <CardContent className="pt-8 pb-8">
               <div className="flex items-center mb-7">
-                <div className="w-1 h-8 bg-primary rounded-full mr-3"></div>
-                <h2 className="text-xl font-serif text-primary">
+                <div className={`w-1 h-8 rounded-full mr-3 ${
+                  dataSource === DATA_SOURCE.LIVE ? 'bg-emerald-500' : 'bg-primary'
+                }`}></div>
+                <h2 className={`text-xl font-serif ${
+                  dataSource === DATA_SOURCE.LIVE ? 'text-emerald-700' : 'text-primary'
+                }`}>
                   Poetry Generation Controls
                 </h2>
               </div>
@@ -444,9 +488,36 @@ const PoetryGeneratorRefactored = () => {
                 loading={poemLoading}
                 dateErrors={dateErrors}
                 isDateRangeValid={isDateRangeValid}
+                // New props for data source toggle
+                dataSource={dataSource}
+                setDataSource={setDataSource}
+                customCity={customCity}
+                setCustomCity={setCustomCity}
+                locationInfo={locationInfo}
+                dataLoading={dataLoading}
               />
 
               <PollutionDisplay avgPollutionRate={avgPollutionRate} pollutant={pollutant} />
+
+              {/* Data Error Display */}
+              <AnimatePresence>
+                {dataError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: -10, height: 0 }}
+                    className="p-4 rounded-lg bg-amber-50 text-amber-700 text-sm border border-amber-200 mt-4"
+                  >
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 mr-3 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-medium mb-1">Data Loading Issue</p>
+                        <p className="text-amber-600">{dataError}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Enhanced Error Display */}
               <AnimatePresence>

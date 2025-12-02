@@ -6,14 +6,18 @@
  */
 
 /**
- * Service for poetry generation
+ * Service for poetry generation - Hybrid Architecture Implementation
  */
 import { GoogleGenerativeAI } from "../utils/googleAI";
 import { generateOfflineFallbackPoem } from "../utils/offlineFallback";
 import { GOOGLE_API_KEY } from "../utils/config";
 
 /**
- * Generate poetry using Google AI or fallback to mock generator
+ * Selects the appropriate generation engine based on system state.
+ * Implements "Hybrid Resilience Architecture" (Claim 2).
+ * 
+ * @param {Object} options - Generation parameters.
+ * @returns {Promise<string>} The generated poem.
  */
 export const generatePoetry = async (options) => {
   const {
@@ -33,6 +37,7 @@ export const generatePoetry = async (options) => {
 
   const poemLength = poemType === "Sonnet" ? 14 : length;
 
+  // 1. Attempt Primary Stochastic Generation (Cloud AI)
   try {
     const googleAI = new GoogleGenerativeAI(apiKey);
 
@@ -48,10 +53,11 @@ export const generatePoetry = async (options) => {
 
     return poemText;
   } catch (error) {
-    console.error("Error generating poem with Google AI:", error);
+    // 2. Fallback to Secondary Deterministic Generation (Local Template)
+    // This "Selector Logic" ensures continuity of service (Resilience Claim).
+    console.warn("Primary generation failed, switching to hybrid fallback:", error.message);
 
-    // Fallback to offline resilience mode
-    const mockPoem = generateOfflineFallbackPoem(
+    const fallbackPoem = generateOfflineFallbackPoem(
       poemType,
       city,
       pollutant,
@@ -61,9 +67,10 @@ export const generatePoetry = async (options) => {
       poemLength
     );
 
+    // Return the fallback poem but attach metadata indicating the source switch
     throw new Error(
-      `Error using Google AI: ${error.message}. Fallback poem available.`,
-      { cause: { fallbackPoem: mockPoem } }
+      `System switched to Resilience Mode: ${error.message}`,
+      { cause: { fallbackPoem } }
     );
   }
 };

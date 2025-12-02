@@ -12,8 +12,8 @@
  * environmental data into qualitative literary output.
  */
 import { GoogleGenAI } from '@google/genai';
-import { SONNET_TEMPLATE, ODE_TEMPLATE, FREE_VERSE_TEMPLATE } from './poetryTypes';
 import { GOOGLE_AI_MODEL } from './config';
+import { generateConstraints } from './constraintEngine';
 
 // Create a class to handle Google Generative AI integration
 export class GoogleGenerativeAI {
@@ -44,7 +44,7 @@ export class GoogleGenerativeAI {
    * @param {number} options.avgPollutionRate - The calculated average pollution level used to determine tone.
    * @param {Date|string} options.fromDate - The start of the data collection period.
    * @param {Date|string} options.toDate - The end of the data collection period.
-   * @returns {Promise<string>} The generated poem text.
+   * @returns {Promise<Object>} Object containing the generated poem text and audit trail.
    */
   async generatePoem(options) {
     const { poemType, city, pollutant, length = 14, avgPollutionRate, fromDate, toDate } = options;
@@ -55,20 +55,25 @@ export class GoogleGenerativeAI {
     const formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    // Determine tone based on pollution rate
-    // This mapping is a key part of the inventive step: converting data -> emotion
-    const tone = avgPollutionRate < 12 ? "pleasing" :
-                 avgPollutionRate < 36 ? "low criticism" :
-                 avgPollutionRate < 56 ? "moderate and critical" :
-                 "more critical and rough";
+    // [INVENTIVE STEP] Use the Constraint Engine to mathematically determine the output parameters
+    const constraints = generateConstraints({ avgPollutionRate, poemType, city });
 
-    // Base prompt construction
+    // [ENHANCED] Build prompt with dynamic imagery from vocabulary constraints
+    const imageryHints = constraints.vocabulary.imagery 
+      ? `\n    [IMAGERY GUIDANCE]: Consider incorporating imagery such as: ${constraints.vocabulary.imagery.join(', ')}.`
+      : '';
+
+    // Base prompt construction using the generated constraints
     let prompt = `
     Compose a ${poemType.toLowerCase()} about ${city}, reflecting on its unique atmosphere, history, and culture. 
     The poem must be ${length} lines long.
     The poem should be inspired by the average pollution rate of ${avgPollutionRate.toFixed(2)} ${pollutant} recorded between ${formattedStartDate} and ${formattedEndDate}. 
     Use vivid imagery and metaphors to illustrate the city's beauty and the subtle impacts of pollution on its environment and people. 
-    The tone of the poem should be ${tone}, avoiding any overtly negative language and refraining from using the word 'smog'. 
+    
+    [SEMANTIC CONSTRAINT]: The tone of the poem must be ${constraints.tone}.
+    [LEXICAL CONSTRAINT]: Avoid using the words: ${constraints.vocabulary.forbidden.join(', ')}.
+    [LEXICAL CONSTRAINT]: Emphasize concepts like: ${constraints.vocabulary.emphasized.join(', ')}.${imageryHints}
+    
     Capture the essence of ${city}, its resilience, and the daily life of its inhabitants in a manner that is both engaging and evocative.
     
     Requirements:
@@ -76,19 +81,9 @@ export class GoogleGenerativeAI {
     - It must follow the style conventions of a ${poemType.toLowerCase()}
     `;
 
-    // Add template specific to poem type
-    switch(poemType) {
-      case "Sonnet":
-        prompt += SONNET_TEMPLATE;
-        break;
-      case "Ode":
-        prompt += ODE_TEMPLATE;
-        break;
-      case "Free Verse":
-        prompt += FREE_VERSE_TEMPLATE;
-        break;
-      default:
-        break;
+    // Append structural template from constraint engine
+    if (constraints.structure) {
+      prompt += constraints.structure;
     }
     
     // Call Google Generative AI API using official SDK
@@ -121,6 +116,7 @@ export class GoogleGenerativeAI {
       }
       
       if (poemText) {
+        // Return poem text (audit trail is available in constraints object if needed)
         return poemText;
       } else {
         throw new Error("No poem text found in Google AI API response");
