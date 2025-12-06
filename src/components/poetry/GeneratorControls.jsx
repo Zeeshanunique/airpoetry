@@ -5,17 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Wind, Database, Wifi, Globe, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Wind, Database, Wifi, MapPin, Search, Star, X } from "lucide-react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { ValidationError, FieldHelpText } from "../ui/form-validation";
-import { POEM_TYPES, CITIES, POLLUTANTS } from "../../constants/poemTypes";
+import { POEM_TYPES, CITIES } from "../../constants/poemTypes";
 import { DATE_RANGE } from "../../constants/pollutionThresholds";
 import { DATA_SOURCE } from "../../hooks/usePollutionDataWithToggle";
 import { getKnownCities } from "../../services/geocoding.service";
@@ -27,8 +27,6 @@ const GeneratorControls = ({
   setPoemLength,
   city,
   setCity,
-  pollutant,
-  setPollutant,
   fromDate,
   setFromDate,
   toDate,
@@ -37,7 +35,7 @@ const GeneratorControls = ({
   loading,
   dateErrors = {},
   isDateRangeValid = true,
-  // New props for data source toggle
+  // Data source toggle props
   dataSource = DATA_SOURCE.HISTORICAL,
   setDataSource,
   customCity,
@@ -45,8 +43,54 @@ const GeneratorControls = ({
   locationInfo,
   dataLoading = false,
 }) => {
-  const [showCustomCity, setShowCustomCity] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const cityInputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const knownCities = getKnownCities();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          cityInputRef.current && !cityInputRef.current.contains(event.target)) {
+        setShowCityDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Filter cities based on search
+  const getFilteredCities = () => {
+    const searchLower = citySearch.toLowerCase().trim();
+    
+    // Popular cities (from CITIES constant)
+    const popularCities = knownCities.filter(c => CITIES.includes(c.name));
+    
+    // Other known cities
+    const otherCities = knownCities.filter(c => !CITIES.includes(c.name));
+    
+    if (!searchLower) {
+      return { popular: popularCities, other: otherCities.slice(0, 10) };
+    }
+    
+    const filterFn = (c) => 
+      c.name.toLowerCase().includes(searchLower) || 
+      c.country.toLowerCase().includes(searchLower);
+    
+    return {
+      popular: popularCities.filter(filterFn),
+      other: otherCities.filter(filterFn).slice(0, 15)
+    };
+  };
+
+  const handleCitySelect = (cityName) => {
+    setCity(cityName);
+    setCitySearch("");
+    setShowCityDropdown(false);
+    if (setCustomCity) setCustomCity(cityName);
+  };
 
   // Handle data source toggle
   const handleDataSourceChange = (newSource) => {
@@ -162,7 +206,7 @@ const GeneratorControls = ({
         )}
       </div>
 
-      {/* City Selection - Different UI based on data source */}
+      {/* City Selection - Unified Search */}
       <div className="space-y-2 pl-8 relative">
         <div className="absolute left-0 top-4 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
           <div className="w-2 h-2 rounded-full bg-primary"></div>
@@ -193,54 +237,125 @@ const GeneratorControls = ({
             </SelectContent>
           </Select>
         ) : (
-          // Live: Text input or dropdown with expanded cities
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={!showCustomCity ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowCustomCity(false)}
-                className="text-xs"
-              >
-                Popular Cities
-              </Button>
-              <Button
-                type="button"
-                variant={showCustomCity ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowCustomCity(true)}
-                className="text-xs"
-              >
-                <Globe className="h-3 w-3 mr-1" />
-                Custom City
-              </Button>
-            </div>
-            
-            {showCustomCity ? (
+          // Live: Direct input with suggestions dropdown
+          <div className="relative">
+            {/* Direct City Input - Type any city */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
+                ref={cityInputRef}
                 type="text"
-                value={customCity || city}
+                value={citySearch || city}
                 onChange={(e) => {
-                  if (setCustomCity) setCustomCity(e.target.value);
-                  setCity(e.target.value);
+                  const val = e.target.value;
+                  setCitySearch(val);
+                  setCity(val);
+                  if (setCustomCity) setCustomCity(val);
+                  if (!showCityDropdown && val) setShowCityDropdown(true);
                 }}
-                placeholder="Enter any city name..."
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                onFocus={() => setShowCityDropdown(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    setShowCityDropdown(false);
+                    cityInputRef.current?.blur();
+                  }
+                  if (e.key === 'Escape') {
+                    setShowCityDropdown(false);
+                  }
+                }}
+                placeholder="Type any city name (e.g., Tokyo, Paris, New York...)"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
               />
-            ) : (
-              <Select value={city} onValueChange={setCity}>
-                <SelectTrigger className="w-full border-gray-300 focus:border-primary shadow-sm transition-all">
-                  <SelectValue>{city}</SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {knownCities.map((c) => (
-                    <SelectItem key={c.name} value={c.name}>
-                      {c.name}, {c.country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            </div>
+
+            {/* Help text */}
+            <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
+              <span>💡</span> Type any city worldwide and press Enter, or select from suggestions below
+            </p>
+
+            {/* Suggestions Dropdown */}
+            {showCityDropdown && (
+              <div 
+                ref={dropdownRef}
+                className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-y-auto"
+              >
+                {(() => {
+                  const filtered = getFilteredCities();
+                  
+                  return (
+                    <>
+                      {/* Popular Cities Section - Always show */}
+                      {filtered.popular.length > 0 && (
+                        <div>
+                          <div className="px-3 py-2 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100 sticky top-0">
+                            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              Popular Cities
+                            </span>
+                          </div>
+                          {filtered.popular.map((c) => (
+                            <button
+                              key={c.name}
+                              type="button"
+                              onClick={() => {
+                                handleCitySelect(c.name);
+                                setCitySearch(c.name);
+                              }}
+                              className={`w-full text-left px-3 py-2.5 text-sm hover:bg-emerald-50 transition-colors flex items-center justify-between ${
+                                city === c.name ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-700'
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-amber-500" />
+                                {c.name}
+                              </span>
+                              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{c.country}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Other Suggestions */}
+                      {filtered.other.length > 0 && (
+                        <div>
+                          <div className="px-3 py-2 bg-gray-50 border-b border-t border-gray-100 sticky top-0">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              {citySearch ? 'Matching Cities' : 'More Cities'}
+                            </span>
+                          </div>
+                          {filtered.other.map((c) => (
+                            <button
+                              key={c.name}
+                              type="button"
+                              onClick={() => {
+                                handleCitySelect(c.name);
+                                setCitySearch(c.name);
+                              }}
+                              className={`w-full text-left px-3 py-2 text-sm hover:bg-emerald-50 transition-colors flex items-center justify-between ${
+                                city === c.name ? 'bg-emerald-50 text-emerald-700' : 'text-gray-700'
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <MapPin className="h-3 w-3 text-gray-400" />
+                                {c.name}
+                              </span>
+                              <span className="text-xs text-gray-400">{c.country}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Custom city hint at bottom */}
+                      <div className="border-t border-gray-100 bg-slate-50 px-3 py-2">
+                        <p className="text-[10px] text-slate-500 text-center">
+                          🌍 Can't find your city? Just type the name and press <kbd className="bg-white px-1 py-0.5 rounded border text-[9px]">Enter</kbd>
+                        </p>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
             )}
           </div>
         )}
@@ -253,29 +368,6 @@ const GeneratorControls = ({
             {locationInfo.latitude && ` (${locationInfo.latitude.toFixed(2)}°, ${locationInfo.longitude.toFixed(2)}°)`}
           </div>
         )}
-      </div>
-
-      {/* Pollutant Type */}
-      <div className="space-y-2 pl-8 relative">
-        <div className="absolute left-0 top-4 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-primary"></div>
-        </div>
-        <Label htmlFor="pollutant" className="text-gray-700 font-medium block">
-          Pollutant Type
-        </Label>
-        <Select value={pollutant} onValueChange={setPollutant}>
-          <SelectTrigger
-            id="pollutant"
-            className="w-full border-gray-300 focus:border-primary shadow-sm transition-all"
-          >
-            <SelectValue>{pollutant}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={POLLUTANTS.PM10}>PM10</SelectItem>
-            <SelectItem value={POLLUTANTS.PM25}>PM2.5</SelectItem>
-            <SelectItem value={POLLUTANTS.NO2}>NO2</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Date Range */}
@@ -411,8 +503,6 @@ GeneratorControls.propTypes = {
   setPoemLength: PropTypes.func.isRequired,
   city: PropTypes.string.isRequired,
   setCity: PropTypes.func.isRequired,
-  pollutant: PropTypes.string.isRequired,
-  setPollutant: PropTypes.func.isRequired,
   fromDate: PropTypes.instanceOf(Date).isRequired,
   setFromDate: PropTypes.func.isRequired,
   toDate: PropTypes.instanceOf(Date).isRequired,
@@ -424,7 +514,7 @@ GeneratorControls.propTypes = {
     to: PropTypes.string,
   }),
   isDateRangeValid: PropTypes.bool,
-  // New props
+  // Data source props
   dataSource: PropTypes.string,
   setDataSource: PropTypes.func,
   customCity: PropTypes.string,

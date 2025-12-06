@@ -21,7 +21,7 @@ import { usePoetryGenerator } from "../../hooks/usePoetryGenerator";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useKeyboardShortcuts, useShortcutHints } from "../../hooks/useKeyboardShortcuts";
 import { downloadPoem, sharePoem } from "../../services/poetry.service";
-import { POEM_TYPES, POEM_LENGTHS, POLLUTANTS } from "../../constants/poemTypes";
+import { POEM_TYPES, POEM_LENGTHS } from "../../constants/poemTypes";
 import { GOOGLE_API_KEY } from "../../utils/config";
 
 const PoetryGeneratorRefactored = () => {
@@ -29,7 +29,6 @@ const PoetryGeneratorRefactored = () => {
   const [poemType, setPoemType] = useState(POEM_TYPES.SONNET);
   const [city, setCity] = useState("Bergamo");
   const [customCity, setCustomCity] = useState("");
-  const [pollutant, setPollutant] = useState(POLLUTANTS.PM10);
   // Use explicit year, month (0-indexed), day to avoid timezone issues
   const [fromDate, setFromDate] = useState(new Date(2022, 0, 1));
   const [toDate, setToDate] = useState(new Date(2023, 11, 31));
@@ -51,15 +50,24 @@ const PoetryGeneratorRefactored = () => {
   const { shortcuts: shortcutHints } = useShortcutHints();
   const [showShortcuts, setShowShortcuts] = useState(false);
 
-  // Custom hooks - use the appropriate hook based on data source
-  const historicalData = usePollutionData(city, pollutant, fromDate, toDate);
-  const liveData = usePollutionDataWithToggle(city, pollutant, fromDate, toDate, dataSource);
+  // Custom hooks - use the appropriate hook based on data source (now returns AQI)
+  const historicalData = usePollutionData(city, fromDate, toDate);
+  const liveData = usePollutionDataWithToggle(city, fromDate, toDate, dataSource);
 
   // Select the appropriate data based on toggle
-  const { avgPollutionRate, loading: dataLoading, error: dataError, locationInfo } = 
+  const { aqi, aqiCategory, pollutantBreakdown, loading: dataLoading, error: dataError, locationInfo } = 
     dataSource === DATA_SOURCE.HISTORICAL ? historicalData : liveData;
 
-  const { poem, loading: poemLoading, error: poemError, generate } = usePoetryGenerator();
+  const { 
+    poem, 
+    citations,
+    literaryInfluences,
+    environmentalSources,
+    searchQueries,
+    loading: poemLoading, 
+    error: poemError, 
+    generate 
+  } = usePoetryGenerator();
   const { translatedText, loading: translationLoading, translate } = useTranslation(poem);
   const [translationLanguage, setTranslationLanguage] = useState("original");
 
@@ -101,8 +109,9 @@ const PoetryGeneratorRefactored = () => {
       await generate({
         poemType,
         city,
-        pollutant,
-        avgPollutionRate,
+        aqi,
+        aqiCategory: aqiCategory?.label,
+        pollutantBreakdown,
         fromDate: fromDate.toISOString().split("T")[0],
         toDate: toDate.toISOString().split("T")[0],
         length: poemLength,
@@ -120,7 +129,7 @@ const PoetryGeneratorRefactored = () => {
         },
       });
     }
-  }, [poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength, generate, isDateRangeValid, toast, dataLoading]);
+  }, [poemType, city, aqi, aqiCategory, pollutantBreakdown, fromDate, toDate, poemLength, generate, isDateRangeValid, toast, dataLoading]);
 
   const handleDownload = useCallback(() => {
     const poemToDownload = translatedText || poem;
@@ -478,8 +487,6 @@ const PoetryGeneratorRefactored = () => {
                 setPoemLength={setPoemLength}
                 city={city}
                 setCity={setCity}
-                pollutant={pollutant}
-                setPollutant={setPollutant}
                 fromDate={fromDate}
                 setFromDate={setFromDate}
                 toDate={toDate}
@@ -488,7 +495,7 @@ const PoetryGeneratorRefactored = () => {
                 loading={poemLoading}
                 dateErrors={dateErrors}
                 isDateRangeValid={isDateRangeValid}
-                // New props for data source toggle
+                // Data source toggle props
                 dataSource={dataSource}
                 setDataSource={setDataSource}
                 customCity={customCity}
@@ -497,7 +504,11 @@ const PoetryGeneratorRefactored = () => {
                 dataLoading={dataLoading}
               />
 
-              <PollutionDisplay avgPollutionRate={avgPollutionRate} pollutant={pollutant} />
+              <PollutionDisplay 
+                aqi={aqi} 
+                aqiCategory={aqiCategory} 
+                pollutantBreakdown={pollutantBreakdown} 
+              />
 
               {/* Data Error Display */}
               <AnimatePresence>
@@ -556,14 +567,20 @@ const PoetryGeneratorRefactored = () => {
           <PoemDisplay
             poem={displayPoem}
             loading={poemLoading}
-            pollutant={pollutant}
             city={city}
             fromDate={fromDate}
             toDate={toDate}
-            avgPollutionRate={avgPollutionRate}
+            aqi={aqi}
+            aqiCategory={aqiCategory}
             onDownload={handleDownload}
             onShare={handleShare}
             showSuccessAnimation={showSuccessAnimation}
+            // Citation props from Google Search grounding
+            citations={citations}
+            literaryInfluences={literaryInfluences}
+            environmentalSources={environmentalSources}
+            searchQueries={searchQueries}
+            // Translation props
             translationLanguage={translationLanguage}
             onLanguageChange={handleLanguageChange}
             onTranslate={handleTranslate}

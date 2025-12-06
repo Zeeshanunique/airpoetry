@@ -245,8 +245,8 @@ const LandingPage = () => {
           <div className="container mx-auto px-4 relative z-10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <StatCard value={730} suffix="+" label="Days of Data" delay={0} />
-              <StatCard value={2} label="Cities Covered" delay={0.1} />
-              <StatCard value={3} label="Pollutant Types" delay={0.2} />
+              <StatCard value="∞" label="Cities Worldwide" delay={0.1} />
+              <StatCard value="AQI" label="Air Quality Index" delay={0.2} />
               <StatCard value={5} label="Languages" delay={0.3} />
             </div>
           </div>

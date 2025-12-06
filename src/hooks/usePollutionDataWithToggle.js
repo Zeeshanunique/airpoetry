@@ -8,10 +8,14 @@
 /**
  * Custom hook for managing pollution data with data source toggle
  * Supports both Historical (JSON files) and Live (API) data sources.
+ * Returns unified AQI values.
  */
 import { useState, useEffect, useCallback } from "react";
-import { loadPollutionData, calculateAvgPollutionRate } from "../services/pollutionData.service";
-import { getLiveAvgPollutionRate } from "../services/liveAirQuality.service";
+import { 
+  loadCityAQIData, 
+  calculateAQIForDateRange 
+} from "../services/pollutionData.service";
+import { getLiveAQI } from "../services/liveAirQuality.service";
 import { geocodeCity } from "../services/geocoding.service";
 
 // Data source modes
@@ -20,12 +24,17 @@ export const DATA_SOURCE = {
   LIVE: 'live'
 };
 
-export const usePollutionDataWithToggle = (city, pollutant, fromDate, toDate, dataSource = DATA_SOURCE.HISTORICAL) => {
-  const [pollutionData, setPollutionData] = useState([]);
-  const [avgPollutionRate, setAvgPollutionRate] = useState(0);
+export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = DATA_SOURCE.HISTORICAL) => {
+  const [aqi, setAqi] = useState(0);
+  const [aqiCategory, setAqiCategory] = useState(null);
+  const [pollutantBreakdown, setPollutantBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [locationInfo, setLocationInfo] = useState(null);
+  
+  // For historical data caching
+  const [pm10Data, setPm10Data] = useState([]);
+  const [pm25Data, setPm25Data] = useState([]);
 
   // Load data based on the selected source
   const loadData = useCallback(async () => {
@@ -34,23 +43,25 @@ export const usePollutionDataWithToggle = (city, pollutant, fromDate, toDate, da
 
     try {
       if (dataSource === DATA_SOURCE.HISTORICAL) {
-        // Use existing JSON file data
-        const data = await loadPollutionData(city, pollutant);
-        setPollutionData(data);
+        // Load both PM10 and PM2.5 data for AQI calculation
+        const { pm10Data: pm10, pm25Data: pm25 } = await loadCityAQIData(city);
+        setPm10Data(pm10);
+        setPm25Data(pm25);
         
-        if (data.length > 0 && fromDate && toDate) {
-          const avgRate = calculateAvgPollutionRate(data, fromDate, toDate);
-          setAvgPollutionRate(avgRate);
+        if (pm10.length > 0 && pm25.length > 0 && fromDate && toDate) {
+          const result = calculateAQIForDateRange(pm10, pm25, fromDate, toDate);
+          setAqi(result.aqi);
+          setAqiCategory(result.aqiCategory);
+          setPollutantBreakdown(result.pollutantBreakdown);
         }
         
         setLocationInfo({
           source: 'Historical Data (JSON)',
           city,
-          dataPoints: data.length
+          dataPoints: pm10.length
         });
       } else {
         // Use Live API data
-        // First, geocode the city to get coordinates
         const geoResult = await geocodeCity(city);
         
         if (!geoResult.success) {
@@ -63,17 +74,12 @@ export const usePollutionDataWithToggle = (city, pollutant, fromDate, toDate, da
         const startDate = fromDate.toISOString().split('T')[0];
         const endDate = toDate.toISOString().split('T')[0];
         
-        // Fetch live pollution data
-        const avgRate = await getLiveAvgPollutionRate(
-          latitude, 
-          longitude, 
-          pollutant, 
-          startDate, 
-          endDate
-        );
+        // Fetch live AQI data
+        const result = await getLiveAQI(latitude, longitude, startDate, endDate);
         
-        setAvgPollutionRate(avgRate);
-        setPollutionData([]); // Live data doesn't return raw array
+        setAqi(result.aqi);
+        setAqiCategory(result.aqiCategory);
+        setPollutantBreakdown(result.pollutantBreakdown);
         
         setLocationInfo({
           source: 'Live API (Open-Meteo)',
@@ -90,28 +96,33 @@ export const usePollutionDataWithToggle = (city, pollutant, fromDate, toDate, da
     } finally {
       setLoading(false);
     }
-  }, [city, pollutant, fromDate, toDate, dataSource]);
+  }, [city, fromDate, toDate, dataSource]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  // Recalculate average when dates change (for historical data)
+  // Recalculate AQI when dates change (for historical data)
   useEffect(() => {
-    if (dataSource === DATA_SOURCE.HISTORICAL && pollutionData.length > 0 && fromDate && toDate) {
-      const avgRate = calculateAvgPollutionRate(pollutionData, fromDate, toDate);
-      setAvgPollutionRate(avgRate);
+    if (dataSource === DATA_SOURCE.HISTORICAL && pm10Data.length > 0 && pm25Data.length > 0 && fromDate && toDate) {
+      const result = calculateAQIForDateRange(pm10Data, pm25Data, fromDate, toDate);
+      setAqi(result.aqi);
+      setAqiCategory(result.aqiCategory);
+      setPollutantBreakdown(result.pollutantBreakdown);
     }
-  }, [pollutionData, fromDate, toDate, dataSource]);
+  }, [pm10Data, pm25Data, fromDate, toDate, dataSource]);
 
   return {
-    pollutionData,
-    avgPollutionRate,
+    aqi,
+    aqiCategory,
+    pollutantBreakdown,
     loading,
     error,
     locationInfo,
     reload: loadData,
-    dataSource
+    dataSource,
+    // Legacy compatibility
+    avgPollutionRate: aqi
   };
 };
 

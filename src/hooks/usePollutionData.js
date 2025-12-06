@@ -6,14 +6,21 @@
  */
 
 /**
- * Custom hook for managing pollution data
+ * Custom hook for managing pollution data with AQI calculation
  */
 import { useState, useEffect, useCallback } from "react";
-import { loadPollutionData, calculateAvgPollutionRate } from "../services/pollutionData.service";
+import { 
+  loadCityAQIData, 
+  calculateAQIForDateRange,
+  getAQICategory 
+} from "../services/pollutionData.service";
 
-export const usePollutionData = (city, pollutant, fromDate, toDate) => {
-  const [pollutionData, setPollutionData] = useState([]);
-  const [avgPollutionRate, setAvgPollutionRate] = useState(0);
+export const usePollutionData = (city, fromDate, toDate) => {
+  const [pm10Data, setPm10Data] = useState([]);
+  const [pm25Data, setPm25Data] = useState([]);
+  const [aqi, setAqi] = useState(0);
+  const [aqiCategory, setAqiCategory] = useState(null);
+  const [pollutantBreakdown, setPollutantBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,32 +29,43 @@ export const usePollutionData = (city, pollutant, fromDate, toDate) => {
     setError(null);
 
     try {
-      const data = await loadPollutionData(city, pollutant);
-      setPollutionData(data);
+      const { pm10Data: pm10, pm25Data: pm25 } = await loadCityAQIData(city);
+      setPm10Data(pm10);
+      setPm25Data(pm25);
     } catch (err) {
       setError(err.message);
       console.error("Error loading pollution data:", err);
     } finally {
       setLoading(false);
     }
-  }, [city, pollutant]);
+  }, [city]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  // Calculate AQI when data or dates change
   useEffect(() => {
-    if (pollutionData.length > 0 && fromDate && toDate) {
-      const avgRate = calculateAvgPollutionRate(pollutionData, fromDate, toDate);
-      setAvgPollutionRate(avgRate);
+    if (pm10Data.length > 0 && pm25Data.length > 0 && fromDate && toDate) {
+      const result = calculateAQIForDateRange(pm10Data, pm25Data, fromDate, toDate);
+      setAqi(result.aqi);
+      setAqiCategory(result.aqiCategory);
+      setPollutantBreakdown(result.pollutantBreakdown);
     }
-  }, [pollutionData, fromDate, toDate]);
+  }, [pm10Data, pm25Data, fromDate, toDate]);
 
   return {
-    pollutionData,
-    avgPollutionRate,
+    aqi,
+    aqiCategory,
+    pollutantBreakdown,
     loading,
     error,
     reload: loadData,
+    // Legacy compatibility
+    avgPollutionRate: aqi,
+    locationInfo: {
+      source: 'Historical Data (JSON)',
+      city,
+    }
   };
 };

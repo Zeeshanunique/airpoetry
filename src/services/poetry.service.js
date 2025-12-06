@@ -16,15 +16,18 @@ import { GOOGLE_API_KEY } from "../utils/config";
  * Selects the appropriate generation engine based on system state.
  * Implements "Hybrid Resilience Architecture" (Claim 2).
  * 
+ * Now returns structured output with poem, citations, and literary influences.
+ * 
  * @param {Object} options - Generation parameters.
- * @returns {Promise<string>} The generated poem.
+ * @returns {Promise<Object>} Object containing poem, citations, and metadata.
  */
 export const generatePoetry = async (options) => {
   const {
     poemType,
     city,
-    pollutant,
-    avgPollutionRate,
+    aqi,
+    aqiCategory,
+    pollutantBreakdown,
     fromDate,
     toDate,
     length,
@@ -37,21 +40,35 @@ export const generatePoetry = async (options) => {
 
   const poemLength = poemType === "Sonnet" ? 14 : length;
 
-  // 1. Attempt Primary Stochastic Generation (Cloud AI)
+  // 1. Attempt Primary Stochastic Generation (Cloud AI) with Google Search grounding
   try {
     const googleAI = new GoogleGenerativeAI(apiKey);
 
-    const poemText = await googleAI.generatePoem({
+    const result = await googleAI.generatePoem({
       poemType,
       city,
-      pollutant,
+      aqi,
+      aqiCategory,
+      pollutantBreakdown,
       length: poemLength,
-      avgPollutionRate,
       fromDate,
       toDate,
     });
 
-    return poemText;
+    // Return structured response with environmental context
+    return {
+      poem: result.poem,
+      citations: result.citations || [],
+      literaryInfluences: result.literaryInfluences || [],
+      environmentalSources: result.environmentalSources || [],
+      searchQueries: result.searchQueries || [],
+      environmentalContext: {
+        aqi,
+        aqiCategory,
+        pollutantBreakdown,
+        source: 'Open-Meteo EAQI'
+      }
+    };
   } catch (error) {
     // 2. Fallback to Secondary Deterministic Generation (Local Template)
     // This "Selector Logic" ensures continuity of service (Resilience Claim).
@@ -60,8 +77,8 @@ export const generatePoetry = async (options) => {
     const fallbackPoem = generateOfflineFallbackPoem(
       poemType,
       city,
-      pollutant,
-      avgPollutionRate,
+      aqi,
+      aqiCategory,
       fromDate,
       toDate,
       poemLength
@@ -70,7 +87,14 @@ export const generatePoetry = async (options) => {
     // Return the fallback poem but attach metadata indicating the source switch
     throw new Error(
       `System switched to Resilience Mode: ${error.message}`,
-      { cause: { fallbackPoem } }
+      { cause: { 
+        fallbackPoem,
+        // Include empty citations for fallback
+        citations: [],
+        literaryInfluences: [],
+        environmentalSources: [],
+        environmentalContext: { aqi, aqiCategory, pollutantBreakdown, source: 'Open-Meteo EAQI' }
+      }}
     );
   }
 };

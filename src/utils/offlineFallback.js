@@ -14,12 +14,12 @@
  * RESILIENCE STRATEGY:
  * 1. Detects API failure in the primary service layer.
  * 2. Switches to a local, template-based generation engine.
- * 3. Uses the same input parameters (city, pollutant, data) to fill pre-structured 
+ * 3. Uses the same input parameters (city, AQI, data) to fill pre-structured 
  *    templates that mimic the structure of the intended output.
  * 4. Ensures the user always receives a "product" even in total system failure.
  */
 
-export const generateOfflineFallbackPoem = (poemType, city, pollutant, avgPollutionRate, fromDate, toDate, poemLength = 14) => {
+export const generateOfflineFallbackPoem = (poemType, city, aqi, aqiCategory, fromDate, toDate, poemLength = 14) => {
   // Format dates for readability
   const formattedFromDate = new Date(fromDate).toLocaleDateString('en-US', { 
     year: 'numeric', month: 'long', day: 'numeric' 
@@ -28,15 +28,18 @@ export const generateOfflineFallbackPoem = (poemType, city, pollutant, avgPollut
     year: 'numeric', month: 'long', day: 'numeric' 
   });
   
-  // Determine pollution level
-  const getPollutionLevel = (rate) => {
-    if (rate <= 12) return "low";
-    if (rate <= 36) return "moderate";
-    if (rate <= 56) return "high";
-    return "very high";
+  // Use AQI category or derive from value
+  const getAQIDescription = (aqiValue) => {
+    if (aqiValue <= 50) return "good";
+    if (aqiValue <= 100) return "moderate";
+    if (aqiValue <= 150) return "unhealthy for sensitive groups";
+    if (aqiValue <= 200) return "unhealthy";
+    if (aqiValue <= 300) return "very unhealthy";
+    return "hazardous";
   };
   
-  const pollutionLevel = getPollutionLevel(avgPollutionRate);
+  const aqiDescription = aqiCategory || getAQIDescription(aqi);
+  const aqiValue = Math.round(aqi);
   
   // Generate different templates based on poem type
   switch(poemType) {
@@ -44,11 +47,11 @@ export const generateOfflineFallbackPoem = (poemType, city, pollutant, avgPollut
       return `[Offline Mode - Network Resilience Active]
 
 The air in ${city} bears a silent weight,
-As ${pollutant} particles drift unseen,
+An index of ${aqiValue} floats unseen,
 From ${formattedFromDate} to ${formattedToDate},
-At ${avgPollutionRate.toFixed(1)} µg/m³, a ${pollutionLevel} sheen.
+A quality we'd call "${aqiDescription}" sheen.
 
-What stories do these particles relate,
+What stories do these measurements relate,
 Of industry, of progress unforeseen?
 The elements that daily we create,
 Transform the very air on which we lean.
@@ -65,13 +68,13 @@ The quality of air, for all our sake.`;
       return `[Offline Mode - Network Resilience Active]
 
 O Air of ${city}, once clear and bright,
-Now bearing ${pollutant} in your invisible embrace,
+Now measured in an index we embrace,
 From ${formattedFromDate} through winter's fading light,
-To ${formattedToDate}, you carry each trace.
+To ${formattedToDate}, at ${aqiValue} we trace.
 
-At ${avgPollutionRate.toFixed(1)} µg/m³, ${pollutionLevel} by measure,
+"${aqiDescription}" - the words that mark our sky,
 You move through lungs and lives with silent grace,
-Connecting all who breathe without their pleasure,
+Connecting all who breathe without a sigh,
 In knowing what they share in common space.
 
 How strange it is to love what we pollute,
@@ -87,16 +90,16 @@ Between our comfort and our common wealth.`;
       return `[Offline Mode - Network Resilience Active]
 
 In ${city}
-    the particles of ${pollutant} drift
-        like memories we'd rather forget
+    the air quality index reads ${aqiValue}
+        a number that breathes with us
 
 From ${formattedFromDate}
 to ${formattedToDate}
-    a record kept in data:
-        ${avgPollutionRate.toFixed(1)} µg/m³
+    the measurement tells a story:
+        "${aqiDescription}"
 
 What does it mean to say 
-    the air quality is "${pollutionLevel}"?
+    the air quality is "${aqiDescription}"?
 
 It means children play beneath a veil
 It means elders breathe with greater labor
@@ -110,6 +113,6 @@ Each number
 
 The air connects us all
 in this breathing world
-    where every molecule matters`;
+    where every breath matters`;
   }
 };
