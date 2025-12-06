@@ -36,8 +36,32 @@ export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = 
   const [pm10Data, setPm10Data] = useState([]);
   const [pm25Data, setPm25Data] = useState([]);
 
+  // Helper to check if dates are valid for the data source
+  const areDatesValidForSource = useCallback(() => {
+    if (!fromDate || !toDate) return false;
+    
+    const now = new Date();
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(now.getDate() - 92);
+    
+    if (dataSource === DATA_SOURCE.LIVE) {
+      // For LIVE mode, dates should be recent (within last 92 days)
+      return fromDate >= ninetyDaysAgo;
+    } else {
+      // For HISTORICAL mode, dates should be in 2022-2023 range
+      const year = fromDate.getFullYear();
+      return year >= 2022 && year <= 2023;
+    }
+  }, [fromDate, toDate, dataSource]);
+
   // Load data based on the selected source
   const loadData = useCallback(async () => {
+    // Skip if dates don't match the expected range for this data source
+    // This prevents loading with stale dates during mode switch
+    if (!areDatesValidForSource()) {
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     // Reset AQI while loading to prevent stale data display
@@ -100,7 +124,7 @@ export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = 
     } finally {
       setLoading(false);
     }
-  }, [city, fromDate, toDate, dataSource]);
+  }, [city, fromDate, toDate, dataSource, areDatesValidForSource]);
 
   useEffect(() => {
     loadData();
