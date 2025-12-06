@@ -15,7 +15,6 @@ import { useDateRangeValidation } from "../ui/form-validation";
 import GeneratorControls from "./GeneratorControls";
 import PollutionDisplay from "./PollutionDisplay";
 import PoemDisplay from "./PoemDisplay";
-import { usePollutionData } from "../../hooks/usePollutionData";
 import { usePollutionDataWithToggle, DATA_SOURCE } from "../../hooks/usePollutionDataWithToggle";
 import { usePoetryGenerator } from "../../hooks/usePoetryGenerator";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -50,13 +49,9 @@ const PoetryGeneratorRefactored = () => {
   const { shortcuts: shortcutHints } = useShortcutHints();
   const [showShortcuts, setShowShortcuts] = useState(false);
 
-  // Custom hooks - use the appropriate hook based on data source (now returns AQI)
-  const historicalData = usePollutionData(city, fromDate, toDate);
-  const liveData = usePollutionDataWithToggle(city, fromDate, toDate, dataSource);
-
-  // Select the appropriate data based on toggle
+  // Custom hook - handles both Historical and Live data sources
   const { aqi, aqiCategory, pollutantBreakdown, loading: dataLoading, error: dataError, locationInfo } = 
-    dataSource === DATA_SOURCE.HISTORICAL ? historicalData : liveData;
+    usePollutionDataWithToggle(city, fromDate, toDate, dataSource);
 
   const { 
     poem, 
@@ -71,8 +66,17 @@ const PoetryGeneratorRefactored = () => {
   const { translatedText, loading: translationLoading, translate } = useTranslation(poem);
   const [translationLanguage, setTranslationLanguage] = useState("original");
 
-  // Update dates when switching data source
+  // Track if this is the initial mount
+  const isInitialMount = React.useRef(true);
+
+  // Update dates ONLY when switching data source (not on initial mount)
   useEffect(() => {
+    // Skip on initial mount - useState already has correct defaults
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
     if (dataSource === DATA_SOURCE.LIVE) {
       // Set dates to last 30 days for live data
       const today = new Date();

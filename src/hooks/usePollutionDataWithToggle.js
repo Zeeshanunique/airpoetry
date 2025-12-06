@@ -28,7 +28,7 @@ export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = 
   const [aqi, setAqi] = useState(0);
   const [aqiCategory, setAqiCategory] = useState(null);
   const [pollutantBreakdown, setPollutantBreakdown] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading=true
   const [error, setError] = useState(null);
   const [locationInfo, setLocationInfo] = useState(null);
   
@@ -40,6 +40,10 @@ export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
+    // Reset AQI while loading to prevent stale data display
+    setAqi(0);
+    setAqiCategory(null);
+    setPollutantBreakdown(null);
 
     try {
       if (dataSource === DATA_SOURCE.HISTORICAL) {
@@ -102,15 +106,20 @@ export const usePollutionDataWithToggle = (city, fromDate, toDate, dataSource = 
     loadData();
   }, [loadData]);
 
-  // Recalculate AQI when dates change (for historical data)
+  // Recalculate AQI when dates change (for historical data only, when data is already loaded)
   useEffect(() => {
-    if (dataSource === DATA_SOURCE.HISTORICAL && pm10Data.length > 0 && pm25Data.length > 0 && fromDate && toDate) {
+    // Skip if loading or no data
+    if (loading || pm10Data.length === 0 || pm25Data.length === 0) return;
+    // Only for historical data
+    if (dataSource !== DATA_SOURCE.HISTORICAL) return;
+    
+    if (fromDate && toDate) {
       const result = calculateAQIForDateRange(pm10Data, pm25Data, fromDate, toDate);
       setAqi(result.aqi);
       setAqiCategory(result.aqiCategory);
       setPollutantBreakdown(result.pollutantBreakdown);
     }
-  }, [pm10Data, pm25Data, fromDate, toDate, dataSource]);
+  }, [fromDate, toDate, dataSource, loading, pm10Data, pm25Data]);
 
   return {
     aqi,

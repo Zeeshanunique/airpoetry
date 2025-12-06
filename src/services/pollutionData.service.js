@@ -174,8 +174,16 @@ export const loadCityAQIData = async (city) => {
  * Calculate AQI for a date range using both PM10 and PM2.5 data
  */
 export const calculateAQIForDateRange = (pm10Data, pm25Data, fromDate, toDate) => {
-  const startStr = fromDate.toISOString().split("T")[0];
-  const endStr = toDate.toISOString().split("T")[0];
+  // Use local date to avoid timezone shifting issues
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  const startStr = formatLocalDate(fromDate);
+  const endStr = formatLocalDate(toDate);
 
   // Filter PM10 data
   const filteredPm10 = pm10Data.filter((entry) => {
@@ -224,8 +232,16 @@ export const calculateAvgPollutionRate = (pollutionData, fromDate, toDate) => {
     return 0;
   }
 
-  const startStr = fromDate.toISOString().split("T")[0];
-  const endStr = toDate.toISOString().split("T")[0];
+  // Use local date to avoid timezone shifting issues
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const startStr = formatLocalDate(fromDate);
+  const endStr = formatLocalDate(toDate);
 
   const filteredData = pollutionData.filter((entry) => {
     const entryDate = new Date(entry.date).toISOString().split("T")[0];
