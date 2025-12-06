@@ -265,8 +265,24 @@ const GeneratorControls = ({
                   }
                 }}
                 placeholder="Type any city name (e.g., Tokyo, Paris, New York...)"
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
               />
+              {/* Clear button (X) */}
+              {(citySearch || city) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCitySearch("");
+                    setCity("");
+                    if (setCustomCity) setCustomCity("");
+                    cityInputRef.current?.focus();
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 hover:text-gray-700 transition-colors"
+                  title="Clear city"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </div>
 
             {/* Help text */}
