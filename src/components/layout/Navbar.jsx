@@ -164,7 +164,7 @@ const Navbar = () => {
                 >
                   <Icon size={16} className="transition-transform group-hover:scale-110" />
                   <span className="text-sm">{link.label}</span>
-                </Link>
+          </Link>
               </motion.div>
             );
           })}
@@ -187,14 +187,14 @@ const Navbar = () => {
             >
               <Sparkles size={14} />
               <span>Generate</span>
-            </Link>
+          </Link>
           </motion.div>
         </div>
       </div>
       
       {/* Mobile menu */}
       <AnimatePresence>
-        {isMenuOpen && (
+      {isMenuOpen && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -242,22 +242,22 @@ const Navbar = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Link 
+            <Link 
                         to={link.to} 
                         className={`py-3 px-4 rounded-xl transition-all duration-300 flex items-center gap-3 ${
                           isActive(link.to)
                             ? 'bg-primary/10 text-primary font-medium'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
                         }`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
+              onClick={() => setIsMenuOpen(false)}
+            >
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           isActive(link.to) ? 'bg-primary text-white' : 'bg-gray-100'
                         }`}>
                           <Icon size={18} />
                         </div>
                         <span className="text-base">{link.label}</span>
-                      </Link>
+            </Link>
                     </motion.div>
                   );
                 })}
@@ -270,19 +270,19 @@ const Navbar = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Link 
+            <Link 
                     to="/generate" 
-                    onClick={() => setIsMenuOpen(false)}
+              onClick={() => setIsMenuOpen(false)}
                     className="flex items-center justify-center gap-2 w-full py-3 bg-primary/90 hover:bg-primary text-white/95 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-                  >
+            >
                     <Sparkles size={16} />
                     Generate Poetry
-                  </Link>
+            </Link>
                 </motion.div>
-              </div>
+          </div>
             </motion.div>
           </>
-        )}
+      )}
       </AnimatePresence>
     </motion.nav>
   );

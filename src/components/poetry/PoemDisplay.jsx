@@ -17,6 +17,7 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { PoemLoadingState } from "../ui/loading-states";
 import { TranslationLoadingState } from "../ui/loading-states";
 import { SuccessCelebration } from "../ui/success-animation";
@@ -217,112 +218,52 @@ const PoemDisplay = ({
                 </div>
               </div>
 
-              {/* Literary Influences Section */}
-              {literaryInfluences.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="p-5 bg-amber-50/50 rounded-lg border border-amber-200/50"
-                >
-                  <div className="flex items-start">
-                    <Library className="h-5 w-5 text-amber-600 mr-3 mt-0.5 flex-shrink-0" />
-                    <div className="w-full">
-                      <h4 className="text-sm font-semibold text-amber-800 mb-3">
-                        📚 Literary Influences
-                      </h4>
-                      <ul className="space-y-3">
-                        {literaryInfluences.map((source, idx) => (
-                          <li key={idx} className="text-sm">
-                            <div className="flex items-start">
-                              <span className="text-amber-600 mr-2 mt-0.5">•</span>
-                              <div className="flex-1">
-                                <span className="font-medium text-amber-900">{source.title}</span>
-                                {source.uri && (
-                                  <a 
-                                    href={source.uri} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="ml-2 text-amber-600 hover:text-amber-700 inline-flex items-center"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                  </a>
-                                )}
-                                {source.description && (
-                                  <p className="text-gray-600 text-xs mt-1 leading-relaxed">
-                                    {source.description}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Environmental Context Section */}
-              <motion.div 
+              {/* References Accordion - Literary Influences, Environmental Context, Citations */}
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="p-5 bg-primary/5 rounded-lg border border-primary/20"
+                transition={{ delay: 0.2 }}
+                className="rounded-xl border border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-white overflow-hidden shadow-sm"
               >
-                <div className="flex items-start">
-                  <Leaf className="h-5 w-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
-                  <div className="w-full">
-                    <h4 className="text-sm font-semibold text-primary mb-3">
-                      🌍 Environmental Context
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                      <div className="flex items-center">
-                        <span className="text-xs text-gray-500 mr-2">AQI:</span>
-                        <span 
-                          className="font-bold px-2 py-0.5 rounded text-white text-sm"
-                          style={{ backgroundColor: aqiCategory?.color || '#22c55e' }}
-                        >
-                          {Math.round(aqi)}
-                        </span>
-                        <span 
-                          className="ml-2 text-sm font-medium"
-                          style={{ color: aqiCategory?.color || '#22c55e' }}
-                        >
-                          ({aqiCategory?.label || 'Good'})
-                        </span>
+                <Accordion type="multiple" defaultValue={["environmental"]} className="w-full">
+                  {/* Literary Influences - Always show */}
+                  <AccordionItem value="literary" className="border-b border-gray-100">
+                    <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-amber-50/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-amber-100">
+                          <Library className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-semibold text-amber-800">Literary Influences</span>
+                          {literaryInfluences.length > 0 && (
+                            <span className="ml-2 text-xs text-amber-600/70 bg-amber-100/50 px-2 py-0.5 rounded-full">
+                              {literaryInfluences.length} source{literaryInfluences.length > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500">
-                        Source: Open-Meteo EAQI
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      Data from <span className="font-semibold">{city}</span> between{" "}
-                      <span className="font-medium">{format(fromDate, "PPP")}</span> and{" "}
-                      <span className="font-medium">{format(toDate, "PPP")}</span>.
-                    </p>
-                    {environmentalSources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-primary/10">
-                        <span className="text-xs text-gray-500 font-medium">Research Context:</span>
-                        <ul className="mt-2 space-y-2">
-                          {environmentalSources.map((source, idx) => (
-                            <li key={idx} className="text-xs">
-                              <div className="flex items-start">
-                                <span className="text-primary/50 mr-1.5 mt-0.5">•</span>
-                                <div>
-                                  <span className="font-medium text-gray-700">{source.title}</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-4">
+                      {literaryInfluences.length > 0 ? (
+                        <ul className="space-y-3 mt-2">
+                          {literaryInfluences.map((source, idx) => (
+                            <li key={idx} className="text-sm">
+                              <div className="flex items-start p-3 rounded-lg bg-amber-50/50 border border-amber-100/50 hover:bg-amber-50 transition-colors">
+                                <span className="text-amber-500 mr-2 mt-0.5 font-bold">•</span>
+                                <div className="flex-1">
+                                  <span className="font-medium text-amber-900">{source.title}</span>
                                   {source.uri && (
                                     <a 
                                       href={source.uri} 
                                       target="_blank" 
                                       rel="noopener noreferrer"
-                                      className="ml-1 text-primary/60 hover:text-primary inline-flex items-center"
+                                      className="ml-2 text-amber-600 hover:text-amber-700 inline-flex items-center gap-1"
                                     >
-                                      <ExternalLink className="h-2.5 w-2.5" />
+                                      <ExternalLink className="h-3 w-3" />
                                     </a>
                                   )}
                                   {source.description && (
-                                    <p className="text-gray-500 mt-0.5 leading-relaxed">
+                                    <p className="text-gray-600 text-xs mt-1 leading-relaxed">
                                       {source.description}
                                     </p>
                                   )}
@@ -331,70 +272,181 @@ const PoemDisplay = ({
                             </li>
                           ))}
                         </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Citations Section */}
-              {citations.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="p-5 bg-gray-50 rounded-lg border border-gray-200"
-                >
-                  <div className="flex items-start">
-                    <Link2 className="h-5 w-5 text-gray-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <div className="w-full">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                        🔗 Citations
-                      </h4>
-                      <ol className="space-y-2">
-                        {citations.map((citation, idx) => (
-                          <li key={idx} className="text-sm flex items-start">
-                            <span className="text-gray-400 mr-2 font-mono text-xs">[{citation.id}]</span>
-                            <div className="flex-1">
-                              <span className="text-gray-700">{citation.title}</span>
-                              {citation.domain && (
-                                <span className="text-gray-400 text-xs ml-2">
-                                  ({citation.domain})
-                                </span>
-                              )}
-                              {citation.uri && (
-                                <a 
-                                  href={citation.uri} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="ml-2 text-blue-500 hover:text-blue-600 inline-flex items-center"
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </a>
-                              )}
-                            </div>
-                          </li>
-                        ))}
-                      </ol>
-                      {searchQueries.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <span className="text-xs text-gray-400">Search queries used:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {searchQueries.map((query, idx) => (
-                              <span 
-                                key={idx}
-                                className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-500"
-                              >
-                                {query}
-                              </span>
-                            ))}
-                          </div>
+                      ) : (
+                        <div className="mt-2 p-4 rounded-lg bg-amber-50/30 border border-amber-100/30 text-center">
+                          <p className="text-sm text-gray-500">
+                            Literary influences will be displayed here when AI finds references.
+                          </p>
                         </div>
                       )}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Environmental Context */}
+                  <AccordionItem value="environmental" className="border-b border-gray-100">
+                    <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-primary/5 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <Leaf className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="text-left flex items-center gap-2">
+                          <span className="font-semibold text-primary">Environmental Context</span>
+                          <span 
+                            className="text-xs text-white px-2 py-0.5 rounded-full font-medium"
+                            style={{ backgroundColor: aqiCategory?.color || '#22c55e' }}
+                          >
+                            AQI {Math.round(aqi)}
+                          </span>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-4">
+                      <div className="mt-2 space-y-4">
+                        {/* AQI Badge Row */}
+                        <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium">Air Quality Index:</span>
+                            <span 
+                              className="font-bold px-3 py-1 rounded-full text-white text-sm shadow-sm"
+                              style={{ backgroundColor: aqiCategory?.color || '#22c55e' }}
+                            >
+                              {Math.round(aqi)}
+                            </span>
+                            <span 
+                              className="text-sm font-semibold"
+                              style={{ color: aqiCategory?.color || '#22c55e' }}
+                            >
+                              {aqiCategory?.label || 'Good'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-400 ml-auto">
+                            Source: Open-Meteo EAQI
+                          </div>
+                        </div>
+
+                        {/* Location & Date */}
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          Data collected from <span className="font-semibold text-primary">{city}</span> between{" "}
+                          <span className="font-medium">{format(fromDate, "PPP")}</span> and{" "}
+                          <span className="font-medium">{format(toDate, "PPP")}</span>.
+                        </p>
+
+                        {/* Research Context */}
+                        {environmentalSources.length > 0 && (
+                          <div className="pt-3 border-t border-primary/10">
+                            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Research Context</span>
+                            <ul className="mt-3 space-y-2">
+                              {environmentalSources.map((source, idx) => (
+                                <li key={idx} className="text-xs">
+                                  <div className="flex items-start p-2 rounded-md bg-white border border-gray-100 hover:border-primary/20 transition-colors">
+                                    <span className="text-primary mr-2 mt-0.5">•</span>
+                                    <div>
+                                      <span className="font-medium text-gray-700">{source.title}</span>
+                                      {source.uri && (
+                                        <a 
+                                          href={source.uri} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="ml-1 text-primary/60 hover:text-primary inline-flex items-center"
+                                        >
+                                          <ExternalLink className="h-2.5 w-2.5" />
+                                        </a>
+                                      )}
+                                      {source.description && (
+                                        <p className="text-gray-500 mt-0.5 leading-relaxed">
+                                          {source.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Citations - Always show */}
+                  <AccordionItem value="citations" className="border-0">
+                    <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-blue-50/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-100">
+                          <Link2 className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div className="text-left">
+                          <span className="font-semibold text-blue-800">Citations & References</span>
+                          {citations.length > 0 && (
+                            <span className="ml-2 text-xs text-blue-600/70 bg-blue-100/50 px-2 py-0.5 rounded-full">
+                              {citations.length} citation{citations.length > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-5 pb-4">
+                      {citations.length > 0 ? (
+                        <>
+                          <ol className="space-y-2 mt-2">
+                            {citations.map((citation, idx) => (
+                              <li key={idx} className="text-sm">
+                                <div className="flex items-start p-3 rounded-lg bg-blue-50/50 border border-blue-100/50 hover:bg-blue-50 transition-colors">
+                                  <span className="text-blue-500 mr-3 font-mono text-xs font-bold bg-blue-100 px-1.5 py-0.5 rounded">
+                                    [{citation.id}]
+                                  </span>
+                                  <div className="flex-1">
+                                    <span className="text-gray-700 font-medium">{citation.title}</span>
+                                    {citation.domain && (
+                                      <span className="text-gray-400 text-xs ml-2">
+                                        ({citation.domain})
+                                      </span>
+                                    )}
+                                    {citation.uri && (
+                                      <a 
+                                        href={citation.uri} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="ml-2 text-blue-500 hover:text-blue-600 inline-flex items-center"
+                                      >
+                                        <ExternalLink className="h-3 w-3" />
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </ol>
+                          {searchQueries.length > 0 && (
+                            <div className="mt-4 pt-3 border-t border-blue-100">
+                              <span className="text-xs text-gray-400 font-medium">Search queries used:</span>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {searchQueries.map((query, idx) => (
+                                  <span 
+                                    key={idx}
+                                    className="text-xs px-3 py-1 bg-blue-100/50 rounded-full text-blue-700 font-medium"
+                                  >
+                                    {query}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="mt-2 p-4 rounded-lg bg-blue-50/30 border border-blue-100/30 text-center">
+                          <p className="text-sm text-gray-500">
+                            No web citations available for this poem.
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Citations appear when the AI uses web search for research.
+                          </p>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </motion.div>
 
               {/* Translation & Feedback Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">

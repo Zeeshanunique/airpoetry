@@ -100,7 +100,7 @@ const Footer = () => {
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
                     {link.label}
-                  </Link>
+            </Link>
                 </motion.div>
               ))}
             </nav>
@@ -161,7 +161,7 @@ const Footer = () => {
                 >
                   <Leaf className="w-4 h-4" />
                   Join the project
-                </Link>
+            </Link>
               </div>
             </div>
           </div>

@@ -125,12 +125,14 @@ export class GoogleGenerativeAI {
       const response = await this.ai.models.generateContent({
         model: this.model,
         contents: prompt,
-        generationConfig: {
+        config: {
           temperature: 0.7,
-          maxOutputTokens: 1500,
-        },
-        // Enable Google Search tool for literary context and citations
-        tools: [{ googleSearch: {} }]
+          // Increased significantly for Gemini 2.5 Pro which uses "thinking" tokens
+          // Budget: ~2000 for thinking + ~1000 for tool use + ~2000 for poem output
+          maxOutputTokens: 8192,
+          // Enable Google Search tool for literary context and citations
+          tools: [{ googleSearch: {} }]
+        }
       });
 
       // Extract the poem text from the response
@@ -145,7 +147,11 @@ export class GoogleGenerativeAI {
         const candidate = response.candidates[0];
         
         if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-          poemText = candidate.content.parts[0].text;
+          // Concatenate all text parts
+          poemText = candidate.content.parts
+            .filter(part => part.text)
+            .map(part => part.text)
+            .join('\n');
         } else if (candidate.text) {
           poemText = candidate.text;
         }
@@ -155,13 +161,36 @@ export class GoogleGenerativeAI {
         throw new Error("No poem text found in Google AI API response");
       }
 
+      // DEBUG: Log the raw text
+      console.log('=== RAW POEM TEXT ===');
+      console.log(poemText);
+      console.log('=== END RAW TEXT ===');
+
       // Parse the text response to separate poem from metadata sections
       const parsedContent = this.parseResponseText(poemText);
+      
+      // DEBUG: Log parsed content
+      console.log('=== PARSED CONTENT ===');
+      console.log('Poem length:', parsedContent.poem.length);
+      console.log('Literary Influences count:', parsedContent.literaryInfluences.length);
+      console.log('Literary Influences:', JSON.stringify(parsedContent.literaryInfluences, null, 2));
+      console.log('Environmental Context count:', parsedContent.environmentalContext.length);
+      console.log('Environmental Context:', JSON.stringify(parsedContent.environmentalContext, null, 2));
+      console.log('=== END PARSED ===');
       
       // Extract grounding metadata for actual source citations (URLs)
       const groundingMetadata = this.extractGroundingMetadata(response);
 
+      // DEBUG: Log grounding metadata
+      console.log('=== GROUNDING METADATA ===');
+      console.log('Citations count:', groundingMetadata.citations.length);
+      console.log('Search queries:', groundingMetadata.searchQueries);
+      console.log('=== END GROUNDING ===');
+
       // Combine parsed text sections with grounding metadata
+      // Literary influences: prefer parsed text, fallback to grounding metadata
+      // Environmental sources: prefer parsed text, fallback to grounding metadata
+      // Citations: from grounding metadata (actual web URLs)
       return {
         poem: parsedContent.poem,
         citations: groundingMetadata.citations,
@@ -194,66 +223,72 @@ export class GoogleGenerativeAI {
     };
 
     try {
-      // Split by common section markers
-      const sections = text.split(/\*{3,}|\n---\n/);
+      // Look for Literary Influences section header (supports multiple formats)
+      // Format 1: ### Literary Influences
+      // Format 2: **Literary Influences:**
+      const literaryHeaderMatch = text.match(/(?:#{1,3}\s*|\*{2})Literary Influences(?:\*{2})?:?/i);
+      const envHeaderMatch = text.match(/(?:#{1,3}\s*|\*{2})Environmental Context(?:\*{2})?:?/i);
       
-      if (sections.length > 1) {
-        // First section is the poem
-        result.poem = sections[0].trim();
-        
-        // Process remaining sections
-        const remainingText = sections.slice(1).join('\n');
-        
-        // Extract Literary Influences section
-        const literaryMatch = remainingText.match(/\*{0,2}Literary Influences\*{0,2}([\s\S]*?)(?=\*{0,2}Environmental Context\*{0,2}|$)/i);
-        if (literaryMatch) {
-          const literaryText = literaryMatch[1];
-          // Extract bullet points
-          const bullets = literaryText.match(/[*\-•]\s*\*{0,2}([^*\n]+)\*{0,2}:?\s*([^\n*]+(?:\n(?![*\-•]).*)*)/g);
-          if (bullets) {
-            result.literaryInfluences = bullets.map((bullet, idx) => {
-              const cleanBullet = bullet.replace(/^[*\-•]\s*/, '').trim();
-              // Extract title (bold text) and description
-              const titleMatch = cleanBullet.match(/\*{1,2}([^*]+)\*{1,2}:?\s*(.*)/s);
-              if (titleMatch) {
-                return {
-                  id: idx + 1,
-                  title: titleMatch[1].trim(),
-                  description: titleMatch[2].trim().replace(/\n/g, ' ')
-                };
-              }
-              return {
-                id: idx + 1,
-                title: cleanBullet.split(':')[0] || cleanBullet,
-                description: cleanBullet.split(':').slice(1).join(':').trim()
-              };
-            });
-          }
+      // Find the poem end (before any section headers or *** divider)
+      let poemEndIndex = text.length;
+      
+      // Check for *** or --- dividers first
+      const dividerMatch = text.match(/\n\*{3,}\n|\n---\n/);
+      if (dividerMatch) {
+        poemEndIndex = Math.min(poemEndIndex, dividerMatch.index);
+      }
+      
+      if (literaryHeaderMatch) {
+        poemEndIndex = Math.min(poemEndIndex, literaryHeaderMatch.index);
+      }
+      if (envHeaderMatch) {
+        poemEndIndex = Math.min(poemEndIndex, envHeaderMatch.index);
+      }
+      
+      // Extract the poem (everything before headers/dividers)
+      result.poem = text.substring(0, poemEndIndex).trim();
+      
+      // Clean up any trailing citation markers from the poem
+      result.poem = result.poem.replace(/\[cite[:\s]*[\d,\s]+\]/gi, '').trim();
+      
+      // Extract Literary Influences section if present
+      if (literaryHeaderMatch) {
+        const startIndex = literaryHeaderMatch.index + literaryHeaderMatch[0].length;
+        // Find the end (next section or end of text)
+        let endIndex = text.length;
+        if (envHeaderMatch && envHeaderMatch.index > startIndex) {
+          endIndex = envHeaderMatch.index;
         }
         
-        // Extract Environmental Context section
-        const envMatch = remainingText.match(/\*{0,2}Environmental Context\*{0,2}([\s\S]*?)$/i);
-        if (envMatch) {
-          const envText = envMatch[1];
-          // Extract bullet points
-          const bullets = envText.match(/[*\-•]\s*\*{0,2}([^*\n]+)\*{0,2}:?\s*([^\n*]+(?:\n(?![*\-•]).*)*)/g);
-          if (bullets) {
-            result.environmentalContext = bullets.map((bullet, idx) => {
-              const cleanBullet = bullet.replace(/^[*\-•]\s*/, '').trim();
-              const titleMatch = cleanBullet.match(/\*{1,2}([^*]+)\*{1,2}:?\s*(.*)/s);
-              if (titleMatch) {
-                return {
-                  id: idx + 1,
-                  title: titleMatch[1].trim(),
-                  description: titleMatch[2].trim().replace(/\n/g, ' ')
-                };
-              }
-              return {
-                id: idx + 1,
-                title: cleanBullet.split(':')[0] || cleanBullet,
-                description: cleanBullet.split(':').slice(1).join(':').trim()
-              };
-            });
+        const literaryText = text.substring(startIndex, endIndex).trim();
+        
+        // Try bullet points first, then paragraphs
+        const items = this.parseBoldBulletItems(literaryText);
+        if (items.length > 0) {
+          result.literaryInfluences = items;
+        } else {
+          // Parse as paragraph
+          const paragraphItems = this.parseParagraphContent(literaryText, 'Literary');
+          if (paragraphItems.length > 0) {
+            result.literaryInfluences = paragraphItems;
+          }
+        }
+      }
+      
+      // Extract Environmental Context section if present
+      if (envHeaderMatch) {
+        const startIndex = envHeaderMatch.index + envHeaderMatch[0].length;
+        const envText = text.substring(startIndex).trim();
+        
+        // Try bullet points first, then paragraphs
+        const items = this.parseBoldBulletItems(envText);
+        if (items.length > 0) {
+          result.environmentalContext = items;
+        } else {
+          // Parse as paragraph
+          const paragraphItems = this.parseParagraphContent(envText, 'Environmental');
+          if (paragraphItems.length > 0) {
+            result.environmentalContext = paragraphItems;
           }
         }
       }
@@ -262,6 +297,126 @@ export class GoogleGenerativeAI {
     }
 
     return result;
+  }
+
+  /**
+   * Helper to parse bold bullet items in format:
+   * *   **Title:** Description text here
+   * or
+   * *   ***Title*:** Description
+   */
+  parseBoldBulletItems(text) {
+    const items = [];
+    
+    // Remove citation markers
+    const cleanText = text.replace(/\[cite[:\s]*[\d,\s]+\]/gi, '');
+    
+    // Match: *   **Title:** Description (handles nested asterisks for italics)
+    // Pattern: bullet, optional spaces, bold title (may contain italics), colon, description
+    const bulletRegex = /\*\s+\*{2,3}([^*]+(?:\*[^*]+\*)?[^*]*)\*{2,3}:?\s*([^\n*]+(?:\n(?!\*\s).*)*)/g;
+    let match;
+    
+    while ((match = bulletRegex.exec(cleanText)) !== null) {
+      let title = match[1].trim().replace(/\*+/g, ''); // Remove any remaining asterisks
+      let description = match[2].trim().replace(/\n/g, ' ');
+      
+      if (title && title.length > 2) {
+        items.push({
+          id: items.length + 1,
+          title,
+          description
+        });
+      }
+    }
+    
+    // If no matches, try simpler pattern for plain bullets
+    if (items.length === 0) {
+      const simpleBulletRegex = /[*\-•]\s+([^:\n]+):\s*([^\n]+(?:\n(?![*\-•]).*)*)/g;
+      while ((match = simpleBulletRegex.exec(cleanText)) !== null) {
+        let title = match[1].trim().replace(/\*+/g, '');
+        let description = match[2].trim().replace(/\n/g, ' ');
+        
+        if (title && title.length > 2) {
+          items.push({
+            id: items.length + 1,
+            title,
+            description
+          });
+        }
+      }
+    }
+    
+    return items;
+  }
+
+  /**
+   * Helper to parse paragraph content into structured items
+   * Splits by sentences and creates meaningful chunks
+   */
+  parseParagraphContent(text, type = 'General') {
+    const items = [];
+    
+    // Remove citation markers and clean up
+    const cleanText = text
+      .replace(/\[cite[:\s]*[\d,\s]+\]/gi, '')
+      .replace(/\*+/g, '')
+      .trim();
+    
+    if (!cleanText || cleanText.length < 20) {
+      return items;
+    }
+    
+    // Split into sentences
+    const sentences = cleanText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 15);
+    
+    if (sentences.length === 0) {
+      // If no sentence breaks, use the whole text
+      items.push({
+        id: 1,
+        title: `${type} Context`,
+        description: cleanText.substring(0, 500)
+      });
+      return items;
+    }
+    
+    // Group 2-3 sentences per item for better readability
+    let currentGroup = [];
+    let itemCount = 0;
+    
+    for (let i = 0; i < sentences.length; i++) {
+      currentGroup.push(sentences[i].trim());
+      
+      // Create item after 2-3 sentences or at the end
+      if (currentGroup.length >= 2 || i === sentences.length - 1) {
+        const description = currentGroup.join(' ');
+        
+        // Extract a meaningful title from first sentence
+        const firstSentence = currentGroup[0];
+        let title;
+        
+        // Look for named entities or key phrases
+        const namedMatch = firstSentence.match(/(?:the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/);
+        if (namedMatch && namedMatch[1].length > 3) {
+          title = namedMatch[1];
+        } else {
+          // Use first 40 chars as title
+          title = firstSentence.substring(0, 40).replace(/[,.]$/, '') + '...';
+        }
+        
+        items.push({
+          id: ++itemCount,
+          title,
+          description
+        });
+        
+        currentGroup = [];
+        
+        // Limit to 3 items max
+        if (itemCount >= 3) break;
+      }
+    }
+    
+    return items;
   }
 
   /**
