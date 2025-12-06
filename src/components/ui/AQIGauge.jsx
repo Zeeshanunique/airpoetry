@@ -131,12 +131,20 @@ const AQIGauge = ({
               </feMerge>
             </filter>
             
-            {/* Needle gradient */}
-            <linearGradient id="needleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#1e293b"/>
-              <stop offset="50%" stopColor="#334155"/>
-              <stop offset="100%" stopColor="#1e293b"/>
+            {/* Needle gradient - metallic look */}
+            <linearGradient id="needleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#475569"/>
+              <stop offset="30%" stopColor="#1e293b"/>
+              <stop offset="50%" stopColor="#0f172a"/>
+              <stop offset="70%" stopColor="#1e293b"/>
+              <stop offset="100%" stopColor="#334155"/>
             </linearGradient>
+            
+            {/* Red accent gradient for tip */}
+            <radialGradient id="tipGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8"/>
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0"/>
+            </radialGradient>
           </defs>
 
           {/* Background arc track */}
@@ -212,42 +220,114 @@ const AQIGauge = ({
             );
           })}
 
-          {/* Premium Needle */}
-          <g filter="url(#gaugeGlow)">
-            {/* Needle shadow */}
-            <motion.line
-              x1={centerX + 2}
-              y1={centerY + 2}
-              initial={{ x2: centerX - needleLength + 2, y2: centerY + 2 }}
-              animate={{ x2: needleTipX + 2, y2: needleTipY + 2 }}
-              transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
-              stroke="rgba(0,0,0,0.2)"
-              strokeWidth={5}
-              strokeLinecap="round"
-            />
+          {/* Premium Tapered Needle */}
+          {(() => {
+            // Calculate perpendicular direction for needle width
+            const perpX = -(needleTipY - centerY) / needleLength;
+            const perpY = (needleTipX - centerX) / needleLength;
             
-            {/* Needle body */}
-            <motion.line
-              x1={centerX}
-              y1={centerY}
-              initial={{ x2: centerX - needleLength, y2: centerY }}
-              animate={{ x2: needleTipX, y2: needleTipY }}
-              transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
-              stroke="url(#needleGrad)"
-              strokeWidth={5}
-              strokeLinecap="round"
-            />
+            // Needle dimensions
+            const baseHalfWidth = 8;
+            const tipOffset = 5; // Small offset from tip for taper
             
-            {/* Needle tip glow */}
-            <motion.circle
-              initial={{ cx: centerX - needleLength, cy: centerY }}
-              animate={{ cx: needleTipX, cy: needleTipY }}
-              transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
-              r={5}
-              fill={currentSegment.color}
-              filter="url(#gaugeGlow)"
-            />
-          </g>
+            // Points for tapered needle shape
+            // Base left
+            const baseLeftX = centerX + perpX * baseHalfWidth;
+            const baseLeftY = centerY + perpY * baseHalfWidth;
+            // Base right  
+            const baseRightX = centerX - perpX * baseHalfWidth;
+            const baseRightY = centerY - perpY * baseHalfWidth;
+            // Near tip left (tapered)
+            const nearTipLeftX = needleTipX - (needleTipX - centerX) * 0.15 + perpX * 2;
+            const nearTipLeftY = needleTipY - (needleTipY - centerY) * 0.15 + perpY * 2;
+            // Near tip right (tapered)
+            const nearTipRightX = needleTipX - (needleTipX - centerX) * 0.15 - perpX * 2;
+            const nearTipRightY = needleTipY - (needleTipY - centerY) * 0.15 - perpY * 2;
+            
+            // Initial positions (pointing left at 180°)
+            const initPerpX = 0;
+            const initPerpY = -1;
+            const initTipX = centerX - needleLength;
+            const initTipY = centerY;
+            
+            const initBaseLeftX = centerX + initPerpX * baseHalfWidth;
+            const initBaseLeftY = centerY + initPerpY * baseHalfWidth;
+            const initBaseRightX = centerX - initPerpX * baseHalfWidth;
+            const initBaseRightY = centerY - initPerpY * baseHalfWidth;
+            const initNearTipLeftX = initTipX + needleLength * 0.15 + initPerpX * 2;
+            const initNearTipLeftY = initTipY + initPerpY * 2;
+            const initNearTipRightX = initTipX + needleLength * 0.15 - initPerpX * 2;
+            const initNearTipRightY = initTipY - initPerpY * 2;
+            
+            return (
+              <g filter="url(#gaugeGlow)">
+                {/* Needle shadow */}
+                <motion.path
+                  initial={{
+                    d: `M ${initTipX} ${initTipY} 
+                        L ${initNearTipLeftX} ${initNearTipLeftY} 
+                        L ${initBaseLeftX} ${initBaseLeftY} 
+                        L ${initBaseRightX} ${initBaseRightY} 
+                        L ${initNearTipRightX} ${initNearTipRightY} Z`
+                  }}
+                  animate={{
+                    d: `M ${needleTipX} ${needleTipY} 
+                        L ${nearTipLeftX} ${nearTipLeftY} 
+                        L ${baseLeftX} ${baseLeftY} 
+                        L ${baseRightX} ${baseRightY} 
+                        L ${nearTipRightX} ${nearTipRightY} Z`
+                  }}
+                  transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
+                  fill="rgba(0,0,0,0.2)"
+                  transform="translate(2, 2)"
+                />
+                
+                {/* Needle body - tapered polygon */}
+                <motion.path
+                  initial={{
+                    d: `M ${initTipX} ${initTipY} 
+                        L ${initNearTipLeftX} ${initNearTipLeftY} 
+                        L ${initBaseLeftX} ${initBaseLeftY} 
+                        L ${initBaseRightX} ${initBaseRightY} 
+                        L ${initNearTipRightX} ${initNearTipRightY} Z`
+                  }}
+                  animate={{
+                    d: `M ${needleTipX} ${needleTipY} 
+                        L ${nearTipLeftX} ${nearTipLeftY} 
+                        L ${baseLeftX} ${baseLeftY} 
+                        L ${baseRightX} ${baseRightY} 
+                        L ${nearTipRightX} ${nearTipRightY} Z`
+                  }}
+                  transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
+                  fill="url(#needleGrad)"
+                />
+                
+                {/* Needle highlight stripe */}
+                <motion.line
+                  x1={centerX}
+                  y1={centerY}
+                  initial={{ x2: initTipX + needleLength * 0.3, y2: initTipY }}
+                  animate={{ 
+                    x2: centerX + (needleTipX - centerX) * 0.7, 
+                    y2: centerY + (needleTipY - centerY) * 0.7 
+                  }}
+                  transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                />
+                
+                {/* Needle tip glow */}
+                <motion.circle
+                  initial={{ cx: initTipX, cy: initTipY }}
+                  animate={{ cx: needleTipX, cy: needleTipY }}
+                  transition={{ type: "spring", stiffness: 50, damping: 12, delay: 0.6 }}
+                  r={4}
+                  fill={currentSegment.color}
+                />
+              </g>
+            );
+          })()}
           
           {/* Center cap - premium design */}
           <circle cx={centerX} cy={centerY} r={20} fill="#1e293b" />
