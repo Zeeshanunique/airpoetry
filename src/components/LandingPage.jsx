@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Wind, 
-  Leaf, 
-  BookOpen, 
-  Sparkles, 
-  Globe2, 
-  Users, 
+import {
+  ArrowRight,
+  Wind,
+  Leaf,
+  BookOpen,
+  Sparkles,
+  Globe2,
+  Users,
   BarChart3,
   ChevronDown,
   Quote,
@@ -24,25 +24,27 @@ const AnimatedCounter = ({ end, duration = 2, suffix = '' }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
+  const isNumeric = typeof end === 'number' || (typeof end === 'string' && !isNaN(Number(end)) && end.trim() !== '');
 
   useEffect(() => {
-    if (isInView) {
+    if (isInView && isNumeric) {
       let start = 0;
-      const increment = end / (duration * 60);
+      const target = Number(end);
+      const increment = target / (duration * 60);
       const timer = setInterval(() => {
         start += increment;
-        if (start >= end) {
-          setCount(end);
+        if (start >= target) {
+          setCount(target);
           clearInterval(timer);
-      } else {
+        } else {
           setCount(Math.floor(start));
         }
       }, 1000 / 60);
       return () => clearInterval(timer);
-      }
-  }, [isInView, end, duration]);
+    }
+  }, [isInView, end, duration, isNumeric]);
 
-  return <span ref={ref}>{count}{suffix}</span>;
+  return <span ref={ref}>{isNumeric ? count : end}{suffix}</span>;
 };
 
 // Feature card component
@@ -84,7 +86,7 @@ const StatCard = ({ value, label, suffix = '', delay }) => (
 const LandingPage = () => {
   const { scrollYProgress } = useScroll();
   const heroRef = useRef(null);
-  
+
   // Parallax effects
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
@@ -116,16 +118,16 @@ const LandingPage = () => {
   return (
     <PageTransition>
       <div className="min-h-screen bg-white overflow-hidden">
-        
+
         {/* Hero Section */}
         <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 z-0">
-            <motion.div 
+            <motion.div
               style={{ y: y1 }}
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             >
-              <img 
+              <img
                 src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2560&auto=format&fit=crop"
                 alt="Forest with sunlight"
                 className="w-full h-full object-cover"
@@ -137,13 +139,13 @@ const LandingPage = () => {
           {/* Animated particles */}
           <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
             {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div
-              key={i}
+              <motion.div
+                key={i}
                 className="absolute w-1 h-1 bg-white/30 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
                 animate={{
                   y: [0, -100, 0],
                   opacity: [0, 1, 0],
@@ -153,12 +155,12 @@ const LandingPage = () => {
                   repeat: Infinity,
                   delay: Math.random() * 5,
                 }}
-            />
-          ))}
-        </div>
+              />
+            ))}
+          </div>
 
           {/* Hero Content */}
-          <motion.div 
+          <motion.div
             style={{ opacity }}
             className="relative z-20 text-center px-4 max-w-5xl mx-auto"
           >
@@ -173,39 +175,39 @@ const LandingPage = () => {
               </span>
             </motion.div>
 
-                <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 leading-tight"
             >
               <span className="text-primary-200">AI</span>(R) Poetry
               <br />
               <span className="text-3xl md:text-5xl lg:text-6xl font-light">Generator</span>
-                </motion.h1>
+            </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-xl md:text-2xl text-white/80 mb-10 max-w-3xl mx-auto leading-relaxed"
             >
-              Transform air pollution data into meaningful poetry through the intersection of 
-              <span className="text-primary-200 font-medium"> technology</span>, 
-              <span className="text-primary-200 font-medium"> literature</span>, and 
+              Transform air pollution data into meaningful poetry through the intersection of
+              <span className="text-primary-200 font-medium"> technology</span>,
+              <span className="text-primary-200 font-medium"> literature</span>, and
               <span className="text-primary-200 font-medium"> ecology</span>
-                </motion.p>
-                  
-                <motion.div 
+            </motion.p>
+
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center"
-                >
-                  <Link 
-                    to="/generate" 
+            >
+              <Link
+                to="/generate"
                 className="group inline-flex items-center justify-center px-8 py-4 bg-primary text-white rounded-full font-medium text-lg hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                  >
+              >
                 <Feather className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                 Start Creating Poetry
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -216,13 +218,13 @@ const LandingPage = () => {
               >
                 Learn More
               </Link>
-                    </motion.div>
-                </motion.div>
-                  
+            </motion.div>
+          </motion.div>
+
           {/* Scroll indicator */}
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
           >
@@ -233,8 +235,8 @@ const LandingPage = () => {
             >
               <span className="text-sm mb-2">Scroll to explore</span>
               <ChevronDown className="w-6 h-6" />
-                </motion.div>
-              </motion.div>
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* Stats Section */}
@@ -249,24 +251,24 @@ const LandingPage = () => {
               <StatCard value="AQI" label="Air Quality Index" delay={0.2} />
               <StatCard value={5} label="Languages" delay={0.3} />
             </div>
-            </div>
-          </section>
+          </div>
+        </section>
 
         {/* Mission Section with Image */}
         <section className="py-24 bg-gray-50 relative overflow-hidden">
-            <motion.div 
+          <motion.div
             style={{ y: y2 }}
             className="absolute -top-20 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
-            />
-            
+          />
+
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Image */}
-                <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
+                viewport={{ once: true }}
                 className="relative"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
@@ -276,9 +278,9 @@ const LandingPage = () => {
                     className="w-full h-[500px] object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  
+
                   {/* Floating quote */}
-                    <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
@@ -295,15 +297,15 @@ const LandingPage = () => {
                 {/* Decorative elements */}
                 <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-primary/20 rounded-2xl -z-10" />
                 <div className="absolute -top-6 -right-6 w-32 h-32 border-2 border-primary/20 rounded-2xl -z-10" />
-                </motion.div>
-                
+              </motion.div>
+
               {/* Content */}
-                <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
-                >
+                viewport={{ once: true }}
+              >
                 <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
                   Our Mission
                 </span>
@@ -312,12 +314,12 @@ const LandingPage = () => {
                 </h2>
                 <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
                   <p>
-                    Air pollution affects millions worldwide, yet remains largely invisible to the naked eye. 
-                    We believe that <strong className="text-gray-800">poetry can make the invisible visible</strong>—transforming 
+                    Air pollution affects millions worldwide, yet remains largely invisible to the naked eye.
+                    We believe that <strong className="text-gray-800">poetry can make the invisible visible</strong>—transforming
                     raw environmental data into emotional experiences that inspire action.
                   </p>
                   <p>
-                    Through the intersection of AI technology and literary tradition, we create 
+                    Through the intersection of AI technology and literary tradition, we create
                     <strong className="text-gray-800"> ecopoetry</strong> that speaks to the heart while informing the mind.
                   </p>
                 </div>
@@ -342,15 +344,15 @@ const LandingPage = () => {
                     <span>AI Technology</span>
                   </div>
                 </div>
-                </motion.div>
-              </div>
+              </motion.div>
             </div>
-          </section>
+          </div>
+        </section>
 
         {/* Features Section */}
         <section className="py-24 bg-white relative">
           <div className="container mx-auto px-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -364,7 +366,7 @@ const LandingPage = () => {
                 The Art of Environmental Poetry
               </h2>
               <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Our platform combines cutting-edge AI with environmental data to create 
+                Our platform combines cutting-edge AI with environmental data to create
                 meaningful poetry that raises awareness about air quality.
               </p>
             </motion.div>
@@ -376,7 +378,7 @@ const LandingPage = () => {
             </div>
           </div>
         </section>
-            
+
         {/* Process Section */}
         <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0">
@@ -403,7 +405,7 @@ const LandingPage = () => {
                   Data Becomes Art
                 </h2>
                 <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-                  Watch as environmental data transforms into evocative poetry through our 
+                  Watch as environmental data transforms into evocative poetry through our
                   AI-powered creative process.
                 </p>
 
@@ -449,11 +451,11 @@ const LandingPage = () => {
                   </div>
                   <div className="font-mono text-sm">
                     <div className="text-gray-500 mb-4">// Sample Generated Poetry</div>
-                <motion.div 
+                    <motion.div
                       initial={{ opacity: 0 }}
                       whileInView={{ opacity: 1 }}
                       transition={{ duration: 1, delay: 0.5 }}
-                  viewport={{ once: true }}
+                      viewport={{ once: true }}
                       className="text-primary-300 italic leading-relaxed"
                     >
                       <p className="mb-2">"Through Bergamo's ancient streets,</p>
@@ -485,13 +487,13 @@ const LandingPage = () => {
         {/* CTA Section */}
         <section className="py-24 bg-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white" />
-          
+
           <div className="container mx-auto px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
+              viewport={{ once: true }}
               className="max-w-4xl mx-auto text-center"
             >
               <motion.div
@@ -508,18 +510,18 @@ const LandingPage = () => {
                 Ready to Create?
               </h2>
               <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Start transforming air pollution data into meaningful poetry. 
+                Start transforming air pollution data into meaningful poetry.
                 Free to use, no registration required.
               </p>
 
               <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link 
-                    to="/generate" 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Link
+                  to="/generate"
                   className="group inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-primary to-primary/90 text-white rounded-full font-medium text-xl hover:shadow-2xl transition-all duration-300 shadow-lg"
-                  >
+                >
                   <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
                   Start Generating Poetry
                   <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
@@ -529,20 +531,20 @@ const LandingPage = () => {
               <p className="mt-6 text-gray-500 text-sm">
                 Join thousands who have transformed data into art
               </p>
-              </motion.div>
-            </div>
-          </section>
+            </motion.div>
+          </div>
+        </section>
 
         {/* Reference Section */}
         <section className="py-8 bg-gray-100 border-t border-gray-200">
           <div className="container mx-auto px-4">
             <p className="text-sm text-gray-500 text-center">
-              Data source: World Health Organization. 
+              Data source: World Health Organization.
               <a href="https://www.who.int/health-topics/air-pollution" className="text-primary hover:underline ml-1" target="_blank" rel="noopener noreferrer">
                 Learn more about air pollution →
               </a>
             </p>
-        </div>
+          </div>
         </section>
       </div>
     </PageTransition>
