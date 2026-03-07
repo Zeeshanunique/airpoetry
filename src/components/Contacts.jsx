@@ -71,26 +71,26 @@ const Contacts = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
     setFormStatus({ type: '', message: '' });
-
+    
     const formPayload = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       formPayload.append(key, key === 'consent' ? (value ? 'Yes' : 'No') : value);
     });
     formPayload.append('access_key', '41df86bc-2a63-4cca-9c0f-514628ac59b4');
-
+    
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         body: formPayload
       });
-
+      
       const data = await response.json();
-
+      
       if (data.success) {
         setFormStatus({
           type: 'success',
@@ -131,7 +131,7 @@ const Contacts = () => {
       a: "We welcome collaborations! Contact us through this form to discuss partnership opportunities."
     }
   ];
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -146,9 +146,9 @@ const Contacts = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
+        <motion.div 
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
@@ -162,8 +162,8 @@ const Contacts = () => {
             <p className="text-xl text-gray-300 leading-relaxed">
               Have questions about the AI(R) Poetry Generator? Interested in collaboration?
               We'd love to hear from you.
-            </p>
-          </motion.div>
+          </p>
+        </motion.div>
         </div>
       </section>
 
@@ -173,19 +173,19 @@ const Contacts = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <ContactCard icon={Mail} title="Email Us" delay={0}>
               <div className="space-y-3">
-                <div>
+                    <div>
                   <p className="text-sm text-gray-500 mb-1">Research & Academic</p>
                   <a href="mailto:stefano.rozzoni@unibg.it" className="text-primary hover:underline">
-                    stefano.rozzoni@unibg.it
-                  </a>
-                </div>
-                <div>
+                          stefano.rozzoni@unibg.it
+                        </a>
+                      </div>
+                    <div>
                   <p className="text-sm text-gray-500 mb-1">Technical Support</p>
                   <a href="mailto:contact@airpoetrygenerator.com" className="text-primary hover:underline">
-                    contact@airpoetrygenerator.com
-                  </a>
-                </div>
-              </div>
+                         contact@airpoetrygenerator.com
+                        </a>
+                      </div>
+                    </div>
             </ContactCard>
 
             <ContactCard icon={MapPin} title="Our Locations" delay={0.1}>
@@ -195,11 +195,11 @@ const Contacts = () => {
                   <p>Department of Literature & Philosophy</p>
                   <p>Bergamo, Italy</p>
                 </div>
-                <div>
+                          <div>
                   <p className="font-medium text-gray-800">Digital Humanities Lab</p>
                   <p>Bangalore, India</p>
-                </div>
-              </div>
+                          </div>
+                        </div>
             </ContactCard>
 
             <ContactCard icon={Clock} title="Response Time" delay={0.2}>
@@ -209,10 +209,10 @@ const Contacts = () => {
               <div className="flex items-center gap-2 text-sm text-primary">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span>Currently accepting inquiries</span>
-              </div>
+                          </div>
             </ContactCard>
-          </div>
-        </div>
+                        </div>
+                      </div>
       </section>
 
       {/* Main Content */}
@@ -228,17 +228,17 @@ const Contacts = () => {
             >
               <Card className="border-0 shadow-xl overflow-hidden">
                 <div className="bg-gradient-to-r from-primary to-primary/90 p-6 text-white">
-                  <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3">
                     <MessageSquare className="w-8 h-8" />
                     <div>
                       <h2 className="text-2xl font-serif font-bold">Send a Message</h2>
                       <p className="text-primary-100 text-sm">We'd love to hear from you</p>
                     </div>
                   </div>
-                </div>
-                
-                <CardContent className="p-6">
-                  {formStatus.message && (
+          </div>
+          
+              <CardContent className="p-6">
+                {formStatus.message && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -255,84 +255,84 @@ const Contacts = () => {
                       )}
                       <p>{formStatus.message}</p>
                     </motion.div>
-                  )}
-
+                )}
+                
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
+                  <div>
                         <Label htmlFor="name" className="text-gray-700">Name *</Label>
-                        <input
-                          id="name"
+                    <input
+                      id="name"
                           name="name"
-                          type="text"
+                      type="text"
                           value={formData.name}
                           onChange={handleChange}
-                          required
+                      required
                           className="w-full mt-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                           placeholder="Your name"
-                        />
-                      </div>
-                      <div>
+                    />
+                  </div>
+                  <div>
                         <Label htmlFor="email" className="text-gray-700">Email *</Label>
-                        <input
-                          id="email"
+                    <input
+                      id="email"
                           name="email"
-                          type="email"
+                      type="email"
                           value={formData.email}
                           onChange={handleChange}
-                          required
+                      required
                           className="w-full mt-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                           placeholder="your@email.com"
-                        />
+                    />
                       </div>
-                    </div>
-
-                    <div>
+                  </div>
+                  
+                  <div>
                       <Label htmlFor="subject" className="text-gray-700">Subject *</Label>
-                      <input
-                        id="subject"
+                    <input
+                      id="subject"
                         name="subject"
-                        type="text"
+                      type="text"
                         value={formData.subject}
                         onChange={handleChange}
-                        required
+                      required
                         className="w-full mt-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                         placeholder="How can we help?"
-                      />
-                    </div>
-
-                    <div>
+                    />
+                  </div>
+                  
+                  <div>
                       <Label htmlFor="message" className="text-gray-700">Message *</Label>
-                      <Textarea
-                        id="message"
+                    <Textarea
+                      id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        required
+                      required
                         className="w-full mt-1 p-3 min-h-[150px] border-gray-200 focus:ring-2 focus:ring-primary/50 focus:border-primary"
                         placeholder="Tell us more about your inquiry..."
-                      />
-                    </div>
-
+                    />
+                  </div>
+                  
                     <div className="flex items-start space-x-3">
-                      <Checkbox 
-                        id="consent" 
+                    <Checkbox 
+                      id="consent" 
                         checked={formData.consent}
                         onCheckedChange={(checked) => setFormData(prev => ({ ...prev, consent: checked }))}
-                        className="mt-1"
-                      />
+                      className="mt-1"
+                    />
                       <Label htmlFor="consent" className="text-sm text-gray-600 font-normal leading-relaxed">
                         I agree to have my feedback published on the website and understand my data will be handled 
                         in accordance with privacy guidelines. (Optional)
-                      </Label>
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      disabled={sending}
+                    </Label>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    disabled={sending}
                       className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium text-lg transition-all"
-                    >
-                      {sending ? (
+                  >
+                    {sending ? (
                         <span className="flex items-center justify-center gap-2">
                           <motion.div
                             animate={{ rotate: 360 }}
@@ -340,19 +340,19 @@ const Contacts = () => {
                           >
                             <Send className="w-5 h-5" />
                           </motion.div>
-                          Sending...
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-2">
+                        Sending...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
                           <Send className="w-5 h-5" />
                           Send Message
-                        </span>
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </motion.div>
+                      </span>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
 
             {/* Right Column - Connect & FAQ */}
             <div className="space-y-8">
@@ -450,7 +450,7 @@ const Contacts = () => {
               <Sparkles className="w-5 h-5" />
             </a>
           </motion.div>
-        </div>
+      </div>
       </section>
     </div>
   );

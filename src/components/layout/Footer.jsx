@@ -1,13 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Feather, 
-  Github, 
-  Heart, 
-  Leaf, 
-  Mail, 
-  ExternalLink, 
+import {
+  Feather,
+  Github,
+  Heart,
+  Leaf,
+  Mail,
   MapPin,
   ArrowUpRight,
   Wind,
@@ -22,6 +21,7 @@ const Footer = () => {
     navigation: [
       { to: '/', label: 'Home' },
       { to: '/about', label: 'About Us' },
+      { to: '/how-it-works', label: 'How It Works' },
       { to: '/generate', label: 'Generator' },
       { to: '/contacts', label: 'Contact' },
     ],
@@ -41,15 +41,15 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white mt-auto relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
         }} />
       </div>
 
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-10 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          
+
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-6 group">
@@ -65,7 +65,7 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Transforming air pollution data into meaningful poetry through the intersection of 
+              Transforming air pollution data into meaningful poetry through the intersection of
               technology, literature, and environmental awareness.
             </p>
             <div className="flex items-center gap-3">
@@ -94,13 +94,13 @@ const Footer = () => {
             <nav className="space-y-3">
               {footerLinks.navigation.map((link) => (
                 <motion.div key={link.to} whileHover={{ x: 5 }}>
-                  <Link 
-                    to={link.to} 
+                  <Link
+                    to={link.to}
                     className="text-gray-400 hover:text-white text-sm transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors" />
                     {link.label}
-            </Link>
+                  </Link>
                 </motion.div>
               ))}
             </nav>
@@ -115,7 +115,7 @@ const Footer = () => {
             <nav className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <motion.div key={link.href} whileHover={{ x: 5 }}>
-                  <a 
+                  <a
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -147,7 +147,7 @@ const Footer = () => {
                   </div>
                 </div>
               </div>
-              <a 
+              <a
                 href="mailto:stefano.rozzoni@unibg.it"
                 className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary-300 transition-colors"
               >
@@ -161,7 +161,7 @@ const Footer = () => {
                 >
                   <Leaf className="w-4 h-4" />
                   Join the project
-            </Link>
+                </Link>
               </div>
             </div>
           </div>
@@ -176,7 +176,7 @@ const Footer = () => {
             © {currentYear} AI(R) Poetry Generator. All rights reserved.
           </p>
           <p className="text-gray-500 text-sm flex items-center gap-1.5">
-            Crafted with 
+            Crafted with
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
             for a sustainable future
           </p>

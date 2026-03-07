@@ -110,17 +110,17 @@ const PoetryGeneratorRefactored = () => {
     }
 
     try {
-      await generate({
-        poemType,
-        city,
+    await generate({
+      poemType,
+      city,
         aqi,
         aqiCategory: aqiCategory?.label,
         pollutantBreakdown,
-        fromDate: fromDate.toISOString().split("T")[0],
-        toDate: toDate.toISOString().split("T")[0],
-        length: poemLength,
-        apiKey: GOOGLE_API_KEY,
-      });
+      fromDate: fromDate.toISOString().split("T")[0],
+      toDate: toDate.toISOString().split("T")[0],
+      length: poemLength,
+      apiKey: GOOGLE_API_KEY,
+    });
       // Show success animation briefly
       setShowSuccessAnimation(true);
       setTimeout(() => setShowSuccessAnimation(false), 2000);
@@ -536,7 +536,7 @@ const PoetryGeneratorRefactored = () => {
 
               {/* Enhanced Error Display */}
               <AnimatePresence>
-                {poemError && (
+              {poemError && (
                   <motion.div
                     initial={{ opacity: 0, y: -10, height: 0 }}
                     animate={{ opacity: 1, y: 0, height: "auto" }}
@@ -557,10 +557,10 @@ const PoetryGeneratorRefactored = () => {
                           <RefreshCw className="h-4 w-4 mr-1" />
                           Try Again
                         </Button>
-                      </div>
-                    </div>
+                  </div>
+                </div>
                   </motion.div>
-                )}
+              )}
               </AnimatePresence>
             </CardContent>
           </Card>
@@ -589,10 +589,10 @@ const PoetryGeneratorRefactored = () => {
             onLanguageChange={handleLanguageChange}
             onTranslate={handleTranslate}
             translationLoading={translationLoading}
-            feedbackText={feedbackText}
-            onFeedbackChange={(e) => setFeedbackText(e.target.value)}
+              feedbackText={feedbackText}
+              onFeedbackChange={(e) => setFeedbackText(e.target.value)}
             onFeedbackSubmit={handleFeedbackSubmit}
-          />
+            />
         </div>
       </motion.div>
     </div>

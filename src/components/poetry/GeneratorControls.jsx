@@ -221,21 +221,21 @@ const GeneratorControls = ({
         
         {dataSource === DATA_SOURCE.HISTORICAL ? (
           // Historical: Dropdown with fixed cities
-          <Select value={city} onValueChange={setCity}>
-            <SelectTrigger
-              id="city"
+        <Select value={city} onValueChange={setCity}>
+          <SelectTrigger
+            id="city"
               className="w-full border-gray-300 focus:border-primary shadow-sm transition-all"
-            >
-              <SelectValue>{city}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {CITIES.map((cityName) => (
-                <SelectItem key={cityName} value={cityName}>
-                  {cityName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          >
+            <SelectValue>{city}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {CITIES.map((cityName) => (
+              <SelectItem key={cityName} value={cityName}>
+                {cityName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         ) : (
           // Live: Direct input with suggestions dropdown
           <div className="relative">
@@ -283,7 +283,7 @@ const GeneratorControls = ({
                   <X className="h-3 w-3" />
                 </button>
               )}
-            </div>
+      </div>
 
             {/* Help text */}
             <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1">
@@ -339,7 +339,7 @@ const GeneratorControls = ({
                             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                               {citySearch ? 'Matching Cities' : 'More Cities'}
                             </span>
-                          </div>
+        </div>
                           {filtered.other.map((c) => (
                             <button
                               key={c.name}

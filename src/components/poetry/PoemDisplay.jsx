@@ -340,7 +340,7 @@ const PoemDisplay = ({
                                 <li key={idx} className="text-xs">
                                   <div className="flex items-start p-2 rounded-md bg-white border border-gray-100 hover:border-primary/20 transition-colors">
                                     <span className="text-primary mr-2 mt-0.5">•</span>
-                                    <div>
+                  <div>
                                       <span className="font-medium text-gray-700">{source.title}</span>
                                       {source.uri && (
                                         <a 
@@ -422,7 +422,7 @@ const PoemDisplay = ({
                               <span className="text-xs text-gray-400 font-medium">Search queries used:</span>
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {searchQueries.map((query, idx) => (
-                                  <span 
+                      <span
                                     key={idx}
                                     className="text-xs px-3 py-1 bg-blue-100/50 rounded-full text-blue-700 font-medium"
                                   >
@@ -500,7 +500,7 @@ const PoemDisplay = ({
                     </div>
                     <span className={`text-xs ${(maxFeedbackLength - feedbackText.length) < 50 ? 'text-amber-600' : 'text-gray-400'}`}>
                       {maxFeedbackLength - feedbackText.length}
-                    </span>
+                      </span>
                   </div>
                   <div className="space-y-3">
                     <Textarea

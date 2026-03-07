@@ -12,6 +12,7 @@ import LandingPage from './components/LandingPage.jsx';
 import PoetryGenerator from './components/poetry/PoetryGeneratorRefactored.jsx';
 import AboutUs from './components/AboutUs.jsx';
 import Contacts from './components/Contacts.jsx';
+import HowItWorks from './components/HowItWorks.jsx';
 import Navbar from './components/layout/Navbar.jsx';
 import Footer from './components/layout/Footer.jsx';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
@@ -20,13 +21,14 @@ import { ToastProvider } from './components/ui/toast.jsx';
 // AnimatedRoutes component to handle route transitions
 const AnimatedRoutes = () => {
   const location = useLocation();
-  
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/generate" element={<PoetryGenerator />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/contacts" element={<Contacts />} />
       </Routes>
     </AnimatePresence>
