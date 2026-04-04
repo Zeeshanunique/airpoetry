@@ -217,7 +217,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
-          
+
           <div className="absolute inset-0 bg-white/90" />
         </div>
 
@@ -286,27 +286,6 @@ const AboutUs = () => {
                   and artificial intelligence, opening new pathways for environmental
                   awareness and artistic expression.
                 </p>
-                <p className="mt-6 text-gray-800 font-medium">
-                  The journey toward the realization of the AI(R) Poetry Generator software followed a real trial-and-error approach, through many stages and attempts: from long reflections to early app prototypes, from effective and less effective tests to exchanges with experts from different parts of the world.
-                </p>
-                <p className="text-gray-800 font-medium">
-                  Our project is therefore conceived as a space for reflection in which the world is the protagonist: as a planet we wish to improve, as well as a constellation of people with different experiences, cultures, and backgrounds who contributed to the development of the software.
-                </p>
-                <p className="text-gray-800 font-medium pb-4">
-                  Through conferences, workshops, and multiple revisions, the project has reached its current version. Please enjoy the AI(R) Poetry Generator, an independent initiative driven by a strong desire to share and improve the planet we inhabit!
-                </p>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 italic">
-                  <h4 className="text-xl font-serif font-bold text-gray-800 mb-3 not-italic">A Starting Point, Not an End</h4>
-                  The poems generated through our software are not intended to be an end in themselves. On the contrary, we hope they will serve as a starting point for developing further activities, debates, and reflections, as well as learning experiences. <br /><br />
-                  Be creative with the contents you create: They are meant to spark curiosity, invite engagement with friends, colleagues, or your learning community. Reuse and reinterpret them in different ways and contexts to raise awareness of air pollution worldwide! <br /><br />
-                  Some examples of what you can do with the poem you develop with our AI are to:
-                  <ul className="list-disc pl-5 mt-2 space-y-2 not-italic text-sm">
-                    <li>… support engagement with air quality conditions in your city or in other cities around the world;</li>
-                    <li>… use it in educational activities with students, comparing AI-generated poetry with poems written by people on similar themes;</li>
-                    <li>… explore the dynamics of AI-generated composition by changing parameters and letting environmental topics inspire new forms of expression;</li>
-                    <li>… use it as the basis for parallel projects and programming ideas.</li>
-                  </ul>
-                </div>
               </div>
 
               <div className="mt-8 p-6 bg-primary/5 rounded-xl border-l-4 border-primary">
@@ -350,6 +329,107 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
+
+      {/* Editorial Content Sections */}
+      <div className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          {/* 1. Different Expertise, Shared Visions */}
+          <section className="mb-24">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">Our Collaboration</span>
+                <h2 className="text-4xl font-serif font-bold text-gray-800 mb-6">Different Expertise, Shared Visions</h2>
+                <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
+                  <p>
+                    The first idea for our AI(R) Poetry Generator was developed in 2024, from an unexpected encounter between a literature scholar and an AI engineer (<a href="#team" className="text-primary hover:underline font-medium">see our profiles</a>) in Bangalore, India. From that moment, a successful exchange began, through which we imagined an innovative tool enabling artistic, participatory, and creative uses of AI to strengthen environmental awareness on a glocal level.
+                  </p>
+                  <p>
+                    Despite the scale and visibility of climate change and its many manifestations worldwide, air pollution often remains an "invisible" form. Moreover, affective detachment often persists between our knowledge of environmental emergencies and the way we relate to and act in response to them. A gap is therefore evident between the widespread desire for change and the concrete actions that are actually taken to address the crisis.
+                  </p>
+                  <p className="font-bold text-gray-800 text-xl py-2">
+                    How can this challenge be confronted?
+                  </p>
+                  <p>
+                    We do believe that poetry can respond to our environmental emergency by helping us imagine new horizons, engage emotions in reflecting on current issues, and evoke personal experiences and dreams by activating a deeper involvement with the world, the one we live in, and the one with which we want to live.
+                  </p>
+                  <p>
+                    At the same time, generative AI–generated poetry opens new visionary possibilities for expressing all this in ever-new forms of (co-)writing texts, making possible unprecedented blends of quantitative and qualitative data for new modes of expression, reflection, and inspiration.
+                  </p>
+                </div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="relative">
+                <img src="https://images.unsplash.com/photo-1607988795691-3d0147b43231?q=80&w=1470&auto=format&fit=crop" alt="Puzzle Teamwork" className="rounded-2xl shadow-2xl w-full h-[500px] object-cover" />
+              </motion.div>
+            </div>
+          </section>
+
+          {/* 2. A Journey across Attempts and Trials */}
+          <section className="mb-24 bg-gray-50 -mx-4 px-4 py-16 rounded-3xl">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="order-2 lg:order-1 relative">
+                <img src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?q=80&w=1471&auto=format&fit=crop" alt="Journey and growth" className="rounded-2xl shadow-2xl w-full h-[500px] object-cover" />
+              </motion.div>
+              <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="order-1 lg:order-2">
+                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">Our Process</span>
+                <h2 className="text-4xl font-serif font-bold text-gray-800 mb-6">A Journey across Attempts and Trials</h2>
+                <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
+                  <p>
+                    The journey toward the realization of the AI(R) Poetry Generator software followed a real trial-and-error approach, through many stages and attempts: from long reflections to early app prototypes, from effective and less effective tests to exchanges with experts from different parts of the world.
+                  </p>
+                  <p>
+                    Our project is therefore conceived as a space for reflection in which the world is the protagonist: as a planet we wish to improve, as well as a constellation of people with different experiences, cultures, and backgrounds who contributed to the development of the software.
+                  </p>
+                  <p>
+                    Through conferences, workshops, and multiple revisions, the project has reached its current version. Please enjoy the AI(R) Poetry Generator, an independent initiative driven by a strong desire to share and improve the planet we inhabit!
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* 3. A Starting Point, Not an End */}
+          <section>
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
+                <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">The Result</span>
+                <h2 className="text-4xl font-serif font-bold text-gray-800 mb-6">A Starting Point, Not an End</h2>
+                <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
+                  <p>
+                    The poems generated through our software are not intended to be an end in themselves. On the contrary, we hope they will serve as a starting point for developing further activities, debates, and reflections, as well as learning experiences.
+                  </p>
+                  <p>
+                    Be creative with the contents you create: They are meant to spark curiosity, invite engagement with friends, colleagues, or your learning community. Reuse and reinterpret them in different ways and contexts to raise awareness of air pollution worldwide!
+                  </p>
+                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                    <span className="font-semibold text-gray-800 block mb-4">Some examples of what you can do with the poem you develop with our AI are to:</span>
+                    <ul className="list-none space-y-4">
+                      <li className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-700">… support engagement with air quality conditions in your city or in other cities around the world;</span>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-700">… use it in educational activities with students, comparing AI-generated poetry with poems written by people on similar themes;</span>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-700">… explore the dynamics of AI-generated composition by changing parameters and letting environmental topics inspire new forms of expression;</span>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                        <span className="text-gray-700">… use it as the basis for parallel projects and programming ideas.</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="relative">
+                <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?q=80&w=1471&auto=format&fit=crop" alt="Creative starting point" className="rounded-2xl shadow-2xl w-full h-[600px] object-cover" />
+              </motion.div>
+            </div>
+          </section>
+        </div>
+      </div>
 
       {/* Team Section */}
       <section className="py-24 bg-gray-50">
