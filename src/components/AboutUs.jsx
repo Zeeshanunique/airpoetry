@@ -200,7 +200,7 @@ const AboutUs = () => {
     {
       icon: Users,
       title: "Community Impact",
-      description: "Building a global community of eco-conscious creators"
+      description: "Learning Community — Building a global community of creators, learners and educators"
     }
   ];
 
@@ -240,8 +240,7 @@ const AboutUs = () => {
               <span className="text-primary-200">AI(R) Poetry</span>
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              A pioneering project bridging environmental science, literary studies, and
-              artificial intelligence to create meaningful poetry from air pollution data.
+              An independent project bridging environmental science, literary studies, AI and education to create poetry from air pollution data.
             </p>
           </motion.div>
         </div>
@@ -574,7 +573,7 @@ const AboutUs = () => {
               Ready to Experience AI Poetry?
             </h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-              Transform air pollution data into meaningful poetry. Free to use, no registration required.
+              Transform air pollution data into poetry. Free to use, no registration required.
             </p>
             <Link
               to="/generate"

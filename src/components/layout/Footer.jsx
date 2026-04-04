@@ -28,7 +28,8 @@ const Footer = () => {
     resources: [
       { href: 'https://www.who.int/health-topics/air-pollution', label: 'WHO Air Pollution', external: true },
       { href: 'https://www.nestresearchnetwork.org', label: 'NEST Network', external: true },
-      { href: 'https://beyondhumanism2024.wordpress.com', label: 'Beyond Humanism', external: true },
+      { href: 'https://aqicn.org/', label: 'Air Quality Index (AQI)', external: true },
+      { href: 'https://www.eea.europa.eu/en', label: 'European Environment Agency (EEA)', external: true },
     ]
   };
 
@@ -65,7 +66,7 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              Transforming air pollution data into meaningful poetry through the intersection of
+              Transforming air pollution data into poetry through the intersection of
               technology, literature, and environmental awareness.
             </p>
             <div className="flex items-center gap-3">
@@ -141,9 +142,7 @@ const Footer = () => {
                 <div className="flex items-start gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-white font-medium">University of Bergamo</p>
-                    <p>Department of Literature</p>
-                    <p>Bergamo, Italy</p>
+                    <p className="text-white font-medium">Developed by Quanta</p>
                   </div>
                 </div>
               </div>
