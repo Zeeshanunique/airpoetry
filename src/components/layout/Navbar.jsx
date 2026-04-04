@@ -11,7 +11,7 @@ const Navbar = () => {
   const location = useLocation();
 
   // Check if we're on a page with a dark hero
-  const darkHeroPages = ['/', '/about', '/contacts'];
+  const darkHeroPages = ['/contacts']; // Homepage and About are now white
   const hasDarkHero = darkHeroPages.includes(location.pathname);
 
   // Handle scroll effect
