@@ -217,12 +217,8 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?q=80&w=2044&auto=format&fit=crop"
-            alt="Nature background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 to-gray-900/80" />
+          
+          <div className="absolute inset-0 bg-white/90" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -232,14 +228,14 @@ const AboutUs = () => {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="inline-block px-4 py-1 bg-white/10 text-white rounded-full text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium mb-6 border border-gray-200">
               About Us
             </span>
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6 leading-tight">
               The Story Behind<br />
-              <span className="text-primary-200">AI(R) Poetry</span>
+              <span className="text-primary">AI(R) Poetry</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-xl text-gray-600 leading-relaxed">
               An independent project bridging environmental science, literary studies, AI and education to create poetry from air pollution data.
             </p>
           </motion.div>

@@ -137,12 +137,8 @@ const Contacts = () => {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=2072&auto=format&fit=crop"
-            alt="Contact background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 to-gray-900/80" />
+          
+          <div className="absolute inset-0 bg-white/90" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -152,14 +148,14 @@ const Contacts = () => {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <span className="inline-block px-4 py-1 bg-white/10 text-white rounded-full text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium mb-6 border border-gray-200">
               Contact Us
             </span>
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6 leading-tight">
               Let's Start a<br />
-              <span className="text-primary-200">Conversation</span>
+              <span className="text-primary">Conversation</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <p className="text-xl text-gray-600 leading-relaxed">
               Have questions about the AI(R) Poetry Generator? Interested in collaboration?
               We'd love to hear from you.
           </p>
@@ -440,7 +436,7 @@ const Contacts = () => {
               Ready to Transform Data into Poetry?
             </h2>
             <p className="text-primary-100 mb-8 max-w-2xl mx-auto">
-              No registration required. Start generating meaningful environmental poetry today.
+              No registration required. Start generating environmental poetry today.
             </p>
             <a
               href="/generate"
