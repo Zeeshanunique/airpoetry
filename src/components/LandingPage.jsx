@@ -255,7 +255,7 @@ const LandingPage = () => {
                   <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1470&auto=format&fit=crop" alt="Abstract art"
                     className="w-full h-[500px] object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  
 
                   
                 </div>
