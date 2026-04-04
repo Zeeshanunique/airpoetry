@@ -50,18 +50,18 @@ const PoetryGeneratorRefactored = () => {
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   // Custom hook - handles both Historical and Live data sources
-  const { aqi, aqiCategory, pollutantBreakdown, loading: dataLoading, error: dataError, locationInfo } = 
+  const { aqi, aqiCategory, pollutantBreakdown, loading: dataLoading, error: dataError, locationInfo } =
     usePollutionDataWithToggle(city, fromDate, toDate, dataSource);
 
-  const { 
-    poem, 
+  const {
+    poem,
     citations,
     literaryInfluences,
     environmentalSources,
     searchQueries,
-    loading: poemLoading, 
-    error: poemError, 
-    generate 
+    loading: poemLoading,
+    error: poemError,
+    generate
   } = usePoetryGenerator();
   const { translatedText, loading: translationLoading, translate } = useTranslation(poem);
   const [translationLanguage, setTranslationLanguage] = useState("original");
@@ -76,7 +76,7 @@ const PoetryGeneratorRefactored = () => {
       isInitialMount.current = false;
       return;
     }
-    
+
     if (dataSource === DATA_SOURCE.LIVE) {
       // Set dates to last 30 days for live data
       const today = new Date();
@@ -110,17 +110,17 @@ const PoetryGeneratorRefactored = () => {
     }
 
     try {
-    await generate({
-      poemType,
-      city,
+      await generate({
+        poemType,
+        city,
         aqi,
         aqiCategory: aqiCategory?.label,
         pollutantBreakdown,
-      fromDate: fromDate.toISOString().split("T")[0],
-      toDate: toDate.toISOString().split("T")[0],
-      length: poemLength,
-      apiKey: GOOGLE_API_KEY,
-    });
+        fromDate: fromDate.toISOString().split("T")[0],
+        toDate: toDate.toISOString().split("T")[0],
+        length: poemLength,
+        apiKey: GOOGLE_API_KEY,
+      });
       // Show success animation briefly
       setShowSuccessAnimation(true);
       setTimeout(() => setShowSuccessAnimation(false), 2000);
@@ -285,7 +285,7 @@ const PoetryGeneratorRefactored = () => {
         </p>
 
         {/* Keyboard shortcuts hint */}
-        <motion.div 
+        <motion.div
           className="flex justify-center mt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -311,7 +311,7 @@ const PoetryGeneratorRefactored = () => {
             >
               <div className="flex justify-between items-center mb-3">
                 <h3 className="font-medium text-sm">Keyboard Shortcuts</h3>
-                <button 
+                <button
                   onClick={() => setShowShortcuts(false)}
                   className="text-gray-400 hover:text-white"
                 >
@@ -341,117 +341,8 @@ const PoetryGeneratorRefactored = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* How It Works Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mb-10 relative"
-      >
-        <div className="absolute -left-6 -top-6 text-primary/5 z-0">
-          <Leaf className="h-20 w-20 rotate-45 animate-float" />
-        </div>
 
-        <Card className="border border-primary/20 shadow-xl bg-gradient-to-br from-white to-cream/40 backdrop-blur relative overflow-hidden z-10">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-10 -mt-10 z-0"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full -ml-10 -mb-10 z-0"></div>
 
-          <CardContent className="pt-8 pb-8 relative z-10">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center">
-                <div className="w-1.5 h-12 bg-primary rounded-full mr-4"></div>
-                <h2 className="text-2xl font-serif text-primary">
-                  How the AI(R) Poetry Generator Works
-                </h2>
-              </div>
-              <Button
-                variant="ghost"
-                className="text-primary hover:text-primary/80 group transition-all"
-                onClick={() => setIsExplanationVisible(!isExplanationVisible)}
-              >
-                {isExplanationVisible ? "Hide" : "Show"}
-              </Button>
-            </div>
-
-            <AnimatePresence>
-              {isExplanationVisible && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-2">
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.1, duration: 0.4 }}
-                      className="group h-full bg-white/80 backdrop-blur p-6 rounded-xl shadow-md border border-primary/10 hover:shadow-lg hover:border-primary/20 transition-all transform hover:-translate-y-1"
-                    >
-                      <div className="mb-4 flex justify-between items-start">
-                        <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                          <Leaf className="h-6 w-6 text-primary" />
-                        </div>
-                      </div>
-                      <h3 className="text-xl font-serif text-primary mb-3">
-                        Data Collection
-                      </h3>
-                      <div className="h-0.5 w-12 bg-primary/30 mb-4 group-hover:w-16 transition-all"></div>
-                      <p className="text-gray-700 leading-relaxed">
-                        We gather air pollution data (PM10, PM2.5, NO2) from monitoring
-                        stations worldwide. Choose between historical data or real-time live API data.
-                      </p>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.4 }}
-                      className="group h-full bg-white/80 backdrop-blur p-6 rounded-xl shadow-md border border-primary/10 hover:shadow-lg hover:border-primary/20 transition-all transform hover:-translate-y-1"
-                    >
-                      <div className="mb-4 flex justify-between items-start">
-                        <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                          <Sparkles className="h-6 w-6 text-primary" />
-                        </div>
-                      </div>
-                      <h3 className="text-xl font-serif text-primary mb-3">
-                        AI Processing
-                      </h3>
-                      <div className="h-0.5 w-12 bg-primary/30 mb-4 group-hover:w-16 transition-all"></div>
-                      <p className="text-gray-700 leading-relaxed">
-                        Using Google Gemini AI, we process the pollution data to generate unique
-                        poems that reflect environmental conditions and our relationship with nature.
-                      </p>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.3, duration: 0.4 }}
-                      className="group h-full bg-white/80 backdrop-blur p-6 rounded-xl shadow-md border border-primary/10 hover:shadow-lg hover:border-primary/20 transition-all transform hover:-translate-y-1"
-                    >
-                      <div className="mb-4 flex justify-between items-start">
-                        <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                          <BookOpen className="h-6 w-6 text-primary" />
-                        </div>
-                      </div>
-                      <h3 className="text-xl font-serif text-primary mb-3">
-                        Creative Output
-                      </h3>
-                      <div className="h-0.5 w-12 bg-primary/30 mb-4 group-hover:w-16 transition-all"></div>
-                      <p className="text-gray-700 leading-relaxed">
-                        The AI creates poetry in various forms (Sonnet, Ode, Free Verse) that
-                        reflects the environmental conditions. Each poem is a unique reflection on
-                        our relationship with the environment.
-                      </p>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </CardContent>
-        </Card>
-      </motion.div>
 
       {/* Generator Interface */}
       <motion.div
@@ -462,24 +353,20 @@ const PoetryGeneratorRefactored = () => {
       >
         {/* Left Column */}
         <div className="space-y-6">
-          <Card className={`border shadow-xl bg-white relative overflow-hidden ${
-            dataSource === DATA_SOURCE.LIVE 
-              ? 'border-emerald-300' 
+          <Card className={`border shadow-xl bg-white relative overflow-hidden ${dataSource === DATA_SOURCE.LIVE
+              ? 'border-emerald-300'
               : 'border-primary/20'
-          }`}>
-            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${
-              dataSource === DATA_SOURCE.LIVE 
-                ? 'from-emerald-500/60 to-emerald-500/20' 
+            }`}>
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${dataSource === DATA_SOURCE.LIVE
+                ? 'from-emerald-500/60 to-emerald-500/20'
                 : 'from-primary/60 to-primary/20'
-            }`}></div>
+              }`}></div>
             <CardContent className="pt-8 pb-8">
               <div className="flex items-center mb-7">
-                <div className={`w-1 h-8 rounded-full mr-3 ${
-                  dataSource === DATA_SOURCE.LIVE ? 'bg-emerald-500' : 'bg-primary'
-                }`}></div>
-                <h2 className={`text-xl font-serif ${
-                  dataSource === DATA_SOURCE.LIVE ? 'text-emerald-700' : 'text-primary'
-                }`}>
+                <div className={`w-1 h-8 rounded-full mr-3 ${dataSource === DATA_SOURCE.LIVE ? 'bg-emerald-500' : 'bg-primary'
+                  }`}></div>
+                <h2 className={`text-xl font-serif ${dataSource === DATA_SOURCE.LIVE ? 'text-emerald-700' : 'text-primary'
+                  }`}>
                   Poetry Generation Controls
                 </h2>
               </div>
@@ -508,10 +395,10 @@ const PoetryGeneratorRefactored = () => {
                 dataLoading={dataLoading}
               />
 
-              <PollutionDisplay 
-                aqi={aqi} 
-                aqiCategory={aqiCategory} 
-                pollutantBreakdown={pollutantBreakdown} 
+              <PollutionDisplay
+                aqi={aqi}
+                aqiCategory={aqiCategory}
+                pollutantBreakdown={pollutantBreakdown}
               />
 
               {/* Data Error Display */}
@@ -536,7 +423,7 @@ const PoetryGeneratorRefactored = () => {
 
               {/* Enhanced Error Display */}
               <AnimatePresence>
-              {poemError && (
+                {poemError && (
                   <motion.div
                     initial={{ opacity: 0, y: -10, height: 0 }}
                     animate={{ opacity: 1, y: 0, height: "auto" }}
@@ -557,10 +444,10 @@ const PoetryGeneratorRefactored = () => {
                           <RefreshCw className="h-4 w-4 mr-1" />
                           Try Again
                         </Button>
-                  </div>
-                </div>
+                      </div>
+                    </div>
                   </motion.div>
-              )}
+                )}
               </AnimatePresence>
             </CardContent>
           </Card>
@@ -589,10 +476,10 @@ const PoetryGeneratorRefactored = () => {
             onLanguageChange={handleLanguageChange}
             onTranslate={handleTranslate}
             translationLoading={translationLoading}
-              feedbackText={feedbackText}
-              onFeedbackChange={(e) => setFeedbackText(e.target.value)}
+            feedbackText={feedbackText}
+            onFeedbackChange={(e) => setFeedbackText(e.target.value)}
             onFeedbackSubmit={handleFeedbackSubmit}
-            />
+          />
         </div>
       </motion.div>
     </div>

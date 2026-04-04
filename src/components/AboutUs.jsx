@@ -636,31 +636,8 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-primary/5">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl font-serif font-bold text-gray-800 mb-4">
-              Ready to Experience AI Poetry?
-            </h2>
-            <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-              Transform air pollution data into poetry. Free to use, no registration required.
-            </p>
-            <Link
-              to="/generate"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors shadow-lg hover:shadow-xl"
-            >
-              Start Generating Poetry
-              <Sparkles className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+
+
     </div>
   );
 };

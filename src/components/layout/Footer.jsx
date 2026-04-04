@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Feather,
-  Github,
+
   Heart,
   Leaf,
   Mail,
@@ -34,7 +34,7 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { href: 'https://github.com/Zeeshanunique', icon: Github, label: 'GitHub' },
+
     { href: 'mailto:stefano.rozzoni@unibg.it', icon: Mail, label: 'Email' },
   ];
 

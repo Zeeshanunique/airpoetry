@@ -12,7 +12,7 @@ import {
   BarChart3,
   ChevronDown,
   Quote,
-  Play,
+
   Feather,
   TreePine,
   CloudRain
@@ -504,56 +504,6 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-24 bg-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="max-w-4xl mx-auto text-center"
-            >
-              <motion.div
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="inline-block mb-8"
-              >
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <Feather className="w-10 h-10 text-primary" />
-                </div>
-              </motion.div>
-
-              <h2 className="text-4xl md:text-6xl font-serif font-bold text-gray-800 mb-6">
-                Ready to Create?
-              </h2>
-              <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Start transforming air pollution data into poetry.
-                Free to use, no registration required.
-              </p>
-
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link
-                  to="/generate"
-                  className="group inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-primary to-primary/90 text-white rounded-full font-medium text-xl hover:shadow-2xl transition-all duration-300 shadow-lg"
-                >
-                  <Play className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
-                  Start Generating Poetry
-                  <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
-                </Link>
-              </motion.div>
-
-              <p className="mt-6 text-gray-500 text-sm">
-                Join thousands who have transformed data into art
-              </p>
-            </motion.div>
-          </div>
-        </section>
 
         {/* Reference Section */}
         <section className="py-8 bg-gray-100 border-t border-gray-200">
