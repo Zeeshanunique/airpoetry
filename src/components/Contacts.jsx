@@ -239,8 +239,8 @@ const Contacts = () => {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex items-start gap-3 p-4 rounded-lg mb-6 ${formStatus.type === 'success'
-                          ? 'bg-green-50 text-green-700 border border-green-200'
-                          : 'bg-red-50 text-red-700 border border-red-200'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
+                        : 'bg-red-50 text-red-700 border border-red-200'
                         }`}
                     >
                       {formStatus.type === 'success' ? (
@@ -417,32 +417,7 @@ const Contacts = () => {
         </div>
       </section>
 
-      {/* Map/CTA Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary to-primary/90 rounded-2xl p-8 md:p-12 text-white text-center"
-          >
-            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
-              Ready to Transform Data into Poetry?
-            </h2>
-            <p className="text-primary-100 mb-8 max-w-2xl mx-auto">
-              No registration required. Start generating environmental poetry today.
-            </p>
-            <a
-              href="/generate"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary rounded-full font-medium hover:bg-primary-50 transition-colors shadow-lg"
-            >
-              Start Creating
-              <Sparkles className="w-5 h-5" />
-            </a>
-          </motion.div>
-        </div>
-      </section>
+
     </div>
   );
 };
