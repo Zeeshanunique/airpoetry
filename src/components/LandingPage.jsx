@@ -127,7 +127,7 @@ const LandingPage = () => {
               style={{ y: y1 }}
               className="absolute inset-0 bg-white"
             >
-              
+
             </motion.div>
             <div className="absolute inset-0 bg-white/90" />
           </div>
@@ -160,16 +160,6 @@ const LandingPage = () => {
             style={{ opacity }}
             className="relative z-20 text-center px-4 max-w-5xl mx-auto"
           >
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <span className="inline-block px-4 py-2 bg-gray-100 rounded-full text-gray-600 text-sm font-medium mb-8 border border-gray-200">
-                <Leaf className="inline w-4 h-4 mr-2" />
-                Where Environment Meets Literature
-              </span>
-            </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
@@ -188,10 +178,11 @@ const LandingPage = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed"
             >
-              Transform air pollution data into poetry through the intersection of
-              <span className="text-primary font-medium"> technology</span>,
-              <span className="text-primary font-medium"> literature</span>, and
-              <span className="text-primary font-medium"> ecology</span>
+              From air pollution data to poetry across
+              <span className="text-primary font-medium"> AI</span>,
+              <span className="text-primary font-medium"> ecology</span>,
+              <span className="text-primary font-medium"> literature</span> and
+              <span className="text-primary font-medium"> education</span>
             </motion.p>
 
             <motion.div
@@ -232,7 +223,7 @@ const LandingPage = () => {
           </motion.div>
         </section>
 
-        
+
 
         {/* Mission Section with Image */}
         <section className="py-24 bg-gray-50 relative overflow-hidden">
@@ -255,9 +246,9 @@ const LandingPage = () => {
                   <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1470&auto=format&fit=crop" alt="Abstract art"
                     className="w-full h-[500px] object-cover"
                   />
-                  
 
-                  
+
+
                 </div>
 
                 {/* Decorative elements */}
@@ -290,7 +281,90 @@ const LandingPage = () => {
                   </p>
                 </div>
 
-                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 1: One tool, many possibilities */}
+        <section className="py-24 bg-white relative overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Content (Left) */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="order-2 lg:order-1"
+              >
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-6 leading-tight">
+                  One tool, many possibilities
+                </h2>
+                <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
+                  <p>
+                    <strong>This software is free</strong>, and you are welcome to use it for <strong>many different purposes</strong>. Let yourself be inspired by the possibilities offered by the <em>AI(R) Poetry Generator</em>: from exploring creative uses of generative AI, to developing educational activities in your classrooms, or simply becoming more aware of air pollution levels in different cities around the world...in an alternative way. <strong>We provide you with a special tool: you discover the best way to use it!</strong>
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Image (Right) */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative order-1 lg:order-2"
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop" alt="Technology and Brain"
+                    className="w-full h-[400px] object-cover"
+                  />
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-primary/20 rounded-2xl -z-10" />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2: A Creative approach to AI */}
+        <section className="py-24 bg-gray-50 relative overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Image (Left) */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1470&auto=format&fit=crop" alt="Person using laptop"
+                    className="w-full h-[400px] object-cover"
+                  />
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute -top-6 -left-6 w-32 h-32 border-2 border-primary/20 rounded-2xl -z-10" />
+              </motion.div>
+
+              {/* Content (Right) */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-6 leading-tight">
+                  A Creative approach to AI
+                </h2>
+                <div className="space-y-6 text-gray-600 text-lg leading-relaxed">
+                  <p>
+                    With this project, <strong>AI becomes a tool in support of your critical reflection on climate change</strong>, as well as on contemporary writing practices. By transforming air pollution data into poetry, our software <strong>fosters awareness of air pollution around the world</strong> and of the possibilities for creative expression of it. Through the AI(R) Poetry Generator, AI is much more than software for content creation: it becomes a way to reflect on the <strong>relationship between yourself and the world</strong>.
+                  </p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
