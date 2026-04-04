@@ -317,7 +317,7 @@ const LandingPage = () => {
                 className="relative order-1 lg:order-2"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                  <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop" alt="Technology and Brain"
+                  <img src="https://unsplash.com/it/foto/il-cervello-allinterno-di-una-lampadina-illustra-unidea-zips8ILZd04" alt="Technology and Brain"
                     className="w-full h-[400px] object-cover"
                   />
                 </div>
@@ -341,7 +341,7 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1470&auto=format&fit=crop" alt="Person using laptop"
+                  <img src="https://unsplash.com/it/foto/persona-che-utilizza-il-computer-portatile-FlPc9_VocJ4" alt="Person using laptop"
                     className="w-full h-[400px] object-cover"
                   />
                 </div>
